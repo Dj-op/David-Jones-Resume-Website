@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alertia — Complete Game Document</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:sans-serif;background:#f9f8f4;color:#2c2c2a;min-height:100vh}
+
+nav{background:#2c2c2a;padding:0.75rem 2rem;display:flex;align-items:center;gap:1.5rem;position:sticky;top:0;z-index:200}
+nav .logo{font-size:13px;font-weight:500;color:#f9f8f4;letter-spacing:0.05em}
+nav .nav-back{font-size:12px;color:#888780;cursor:pointer;border:none;background:none;font-family:sans-serif;display:none}
+nav .nav-back:hover{color:#f9f8f4}
+nav .nav-back.visible{display:block}
+nav .nav-tabs{display:flex;gap:0.5rem;margin-left:auto}
+nav .tab-btn{font-size:11px;padding:0.3rem 0.75rem;border:1px solid rgba(255,255,255,0.15);border-radius:4px;background:none;color:#888780;cursor:pointer;font-family:sans-serif;transition:all 0.2s}
+nav .tab-btn:hover,nav .tab-btn.active{background:rgba(255,255,255,0.1);color:#f9f8f4;border-color:rgba(255,255,255,0.3)}
+
+#home-view{padding:2rem}
+#home-view h1{font-size:20px;font-weight:500;margin-bottom:0.25rem}
+#home-view .desc{font-size:13px;color:#5f5e5a;margin-bottom:2rem}
+
+.phase-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:0.75rem;padding:0.3rem 0.6rem;border-radius:4px;display:inline-block}
+.ph-p1{background:#E1F5EE;color:#085041}
+.ph-turn{background:#FCEBEB;color:#791F1F}
+.ph-p2{background:#FAECE7;color:#712B13}
+.ph-sys{background:#EEEDFE;color:#3C3489}
+
+.chapter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:0.75rem;margin-bottom:2rem}
+.chapter-card{background:#fff;border:1px solid #d3d1c7;border-radius:6px;padding:1rem 1.25rem;cursor:pointer;transition:border-color 0.2s,box-shadow 0.2s}
+.chapter-card:hover{border-color:#888780;box-shadow:0 2px 8px rgba(44,44,42,0.08)}
+.chapter-card .ch-num{font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:#888780;margin-bottom:0.25rem}
+.chapter-card .ch-title{font-size:14px;font-weight:500;color:#2c2c2a;margin-bottom:0.35rem}
+.chapter-card .ch-sub{font-size:12px;color:#5f5e5a;line-height:1.5}
+.chapter-card .ch-tags{display:flex;gap:0.35rem;margin-top:0.5rem;flex-wrap:wrap}
+.tag{font-size:10px;padding:0.15rem 0.4rem;border-radius:3px;font-weight:500}
+.tag-boss{background:#FCEBEB;color:#A32D2D}
+.tag-open{background:#EAF3DE;color:#27500A}
+.tag-shop{background:#FAEEDA;color:#633806}
+.tag-magic{background:#EEEDFE;color:#3C3489}
+.tag-turn{background:#FAECE7;color:#712B13}
+
+#chapter-view{display:none;padding:2rem}
+#chapter-view.visible{display:block}
+#home-view.hidden{display:none}
+#system-view{display:none;padding:2rem}
+#system-view.visible{display:block}
+
+#chapter-view h2{font-size:18px;font-weight:500;margin-bottom:0.25rem}
+.ch-desc{font-size:13px;color:#5f5e5a;margin-bottom:0.5rem}
+.hint{font-size:12px;color:#888780;font-style:italic;margin-bottom:1.5rem}
+
+.legend{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#5f5e5a}
+.ldot{width:10px;height:10px;border-radius:2px}
+.d-gray{background:#F1EFE8;border:1px solid #5F5E5A}
+.d-pink{background:#FBEAF0;border:1px solid #993556}
+.d-blue{background:#E6F1FB;border:1px solid #185FA5}
+.d-red{background:#FCEBEB;border:1px solid #A32D2D}
+.d-green{background:#EAF3DE;border:1px solid #3B6D11}
+.d-amber{background:#FAEEDA;border:1px solid #854F0B}
+.d-teal{background:#E1F5EE;border:1px solid #0F6E56}
+.d-coral{background:#FAECE7;border:1px solid #993C1D}
+.d-purple{background:#EEEDFE;border:1px solid #534AB7}
+.d-lime{background:#f0f7e0;border:1px solid #5a8a00}
+
+svg text{font-family:sans-serif}
+.t{font-size:14px;fill:#2c2c2a}
+.ts{font-size:12px;fill:#5f5e5a}
+.th{font-size:14px;font-weight:500;fill:#2c2c2a}
+.c-pink>rect{fill:#FBEAF0;stroke:#993556}.c-pink>text.th{fill:#72243E}.c-pink>text.ts{fill:#993556}
+.c-teal>rect{fill:#E1F5EE;stroke:#0F6E56}.c-teal>text.th{fill:#085041}.c-teal>text.ts{fill:#0F6E56}
+.c-blue>rect{fill:#E6F1FB;stroke:#185FA5}.c-blue>text.th{fill:#0C447C}.c-blue>text.ts{fill:#185FA5}
+.c-amber>rect{fill:#FAEEDA;stroke:#854F0B}.c-amber>text.th{fill:#633806}.c-amber>text.ts{fill:#854F0B}
+.c-purple>rect{fill:#EEEDFE;stroke:#534AB7}.c-purple>text.th{fill:#3C3489}.c-purple>text.ts{fill:#534AB7}
+.c-red>rect{fill:#FCEBEB;stroke:#A32D2D}.c-red>text.th{fill:#791F1F}.c-red>text.ts{fill:#A32D2D}
+.c-coral>rect{fill:#FAECE7;stroke:#993C1D}.c-coral>text.th{fill:#712B13}.c-coral>text.ts{fill:#993C1D}
+.c-green>rect{fill:#EAF3DE;stroke:#3B6D11}.c-green>text.th{fill:#27500A}.c-green>text.ts{fill:#3B6D11}
+.c-gray>rect{fill:#F1EFE8;stroke:#5F5E5A}.c-gray>text.th{fill:#444441}.c-gray>text.ts{fill:#5F5E5A}
+.c-lime>rect{fill:#f0f7e0;stroke:#5a8a00}.c-lime>text.th{fill:#3a5c00}.c-lime>text.ts{fill:#5a8a00}
+.arr{stroke:#888780;stroke-width:1.5;fill:none}
+.node{cursor:pointer}.node:hover>rect{opacity:0.85}
+
+.overlay{display:none;position:fixed;inset:0;background:rgba(44,44,42,0.5);z-index:300;align-items:center;justify-content:center;padding:1.5rem}
+.overlay.open{display:flex}
+.modal{background:#fff;border:1px solid #d3d1c7;border-radius:6px;max-width:660px;width:100%;max-height:85vh;overflow-y:auto;padding:1.75rem 2rem;position:relative}
+.modal-close{position:absolute;top:0.875rem;right:1rem;background:none;border:1px solid #d3d1c7;border-radius:4px;font-size:11px;color:#888780;padding:0.2rem 0.6rem;cursor:pointer;font-family:sans-serif}
+.modal-close:hover{color:#2c2c2a;border-color:#888780}
+.modal-tag{font-size:11px;color:#888780;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.2rem}
+.modal-title{font-size:16px;font-weight:500;color:#2c2c2a;margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid #e8e6df}
+.sec{margin-bottom:1.1rem}
+.sec+.sec{padding-top:0.875rem;border-top:1px solid #f1efe8}
+.sec-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:0.4rem}
+.lbl-what{color:#185FA5}.lbl-opt{color:#3B6D11}.lbl-int{color:#854F0B}.lbl-mus{color:#993556}.lbl-open{color:#27500A}.lbl-shop{color:#633806}.lbl-magic{color:#534AB7}
+.sec-body{font-size:13px;line-height:1.75;color:#3d3d3a}
+.sec-body p+p{margin-top:0.6rem}
+.dlg{margin:0.5rem 0;padding:0.45rem 0.875rem;border-left:2px solid #d3d1c7;font-size:13px;color:#5f5e5a}
+.dlg .spk{display:block;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;font-weight:500;color:#888780;margin-bottom:0.15rem}
+.dlg.fae{border-left-color:#1D9E75;color:#085041}.dlg.fae .spk{color:#1D9E75}
+.dlg.inn{border-left-color:#BA7517;color:#633806;font-style:italic}.dlg.inn .spk{color:#BA7517}
+.dlg.arch{border-left-color:#534AB7;color:#3C3489}.dlg.arch .spk{color:#534AB7}
+.motif{background:#FBEAF0;border:1px solid #F4C0D1;border-radius:3px;padding:0.5rem 0.75rem;font-size:12px;color:#72243E;font-style:italic;margin:0.5rem 0}
+.collectible{background:#E6F1FB;border:1px solid #B5D4F4;border-radius:3px;padding:0.5rem 0.75rem;font-size:12px;color:#0C447C;margin:0.5rem 0}
+.open-box{background:#EAF3DE;border:1px solid #C0DD97;border-radius:3px;padding:0.5rem 0.75rem;font-size:12px;color:#27500A;margin:0.5rem 0}
+.shop-box{background:#FAEEDA;border:1px solid #FAC775;border-radius:3px;padding:0.5rem 0.75rem;font-size:12px;color:#633806;margin:0.5rem 0}
+.magic-box{background:#EEEDFE;border:1px solid #CECBF6;border-radius:3px;padding:0.5rem 0.75rem;font-size:12px;color:#3C3489;margin:0.5rem 0}
+
+/* SYSTEM VIEW */
+.sys-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;margin-bottom:2rem}
+.sys-card{background:#fff;border:1px solid #d3d1c7;border-radius:6px;padding:1.25rem}
+.sys-card h3{font-size:14px;font-weight:500;margin-bottom:0.5rem;color:#2c2c2a}
+.sys-card p{font-size:12px;color:#5f5e5a;line-height:1.6;margin-bottom:0.5rem}
+.sys-card .sys-tag{font-size:10px;padding:0.2rem 0.5rem;border-radius:3px;font-weight:500;display:inline-block;margin-bottom:0.5rem}
+.skill-row{display:flex;justify-content:space-between;align-items:center;padding:0.35rem 0;border-bottom:1px solid #f1efe8;font-size:12px}
+.skill-row:last-child{border-bottom:none}
+.skill-name{font-weight:500;color:#2c2c2a}
+.skill-meta{color:#888780;font-size:11px}
+.magic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.75rem;margin-bottom:1.5rem}
+.magic-card{border-radius:6px;padding:1rem;font-size:12px}
+.magic-card h4{font-size:13px;font-weight:500;margin-bottom:0.3rem}
+.magic-card .refined{font-size:11px;opacity:0.7;margin-top:0.3rem}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">Alertia — Game Document</span>
+  <button class="nav-back" id="navBack" onclick="showHome()">← All Chapters</button>
+  <div class="nav-tabs">
+    <button class="tab-btn active" id="tabStory" onclick="switchTab('story')">Story</button>
+    <button class="tab-btn" id="tabSystems" onclick="switchTab('systems')">Systems</button>
+  </div>
+</nav>
+
+<div id="home-view">
+  <h1>Alertia — Game Document</h1>
+  <p class="desc">Select a chapter to view its beats and open world structure. Click any node to read the full scene.</p>
+
+  <p class="phase-label ph-p1">Phase 1 — The Journey West</p>
+  <div class="chapter-grid" id="grid-p1"></div>
+
+  <p class="phase-label ph-turn">The Turning Point</p>
+  <div class="chapter-grid" id="grid-turn"></div>
+
+  <p class="phase-label ph-p2">Phase 2 — The Corrupted World</p>
+  <div class="chapter-grid" id="grid-p2"></div>
+</div>
+
+<div id="chapter-view">
+  <h2 id="cv-title"></h2>
+  <p class="ch-desc" id="cv-desc"></p>
+  <p class="hint">Click any node to read the full scene. Green nodes = open world. Amber nodes = shop or optional.</p>
+  <div class="legend">
+    <div class="legend-item"><div class="ldot d-gray"></div>Section</div>
+    <div class="legend-item"><div class="ldot d-pink"></div>Cult / Kana</div>
+    <div class="legend-item"><div class="ldot d-blue"></div>Story scene</div>
+    <div class="legend-item"><div class="ldot d-red"></div>Boss</div>
+    <div class="legend-item"><div class="ldot d-green"></div>Companion / open world</div>
+    <div class="legend-item"><div class="ldot d-amber"></div>Shop / optional</div>
+    <div class="legend-item"><div class="ldot d-purple"></div>Temple / Architect</div>
+    <div class="legend-item"><div class="ldot d-coral"></div>Corrupted</div>
+    <div class="legend-item"><div class="ldot d-lime"></div>Magic unlock</div>
+  </div>
+  <div id="cv-svg"></div>
+</div>
+
+<div id="system-view">
+  <h1 style="font-size:20px;font-weight:500;margin-bottom:0.25rem">Game Systems</h1>
+  <p style="font-size:13px;color:#5f5e5a;margin-bottom:2rem">Combat mechanics, skill trees, and magic system reference.</p>
+
+  <p class="phase-label ph-sys" style="margin-bottom:1rem">Combat System</p>
+  <div class="sys-grid">
+    <div class="sys-card">
+      <span class="sys-tag" style="background:#E1F5EE;color:#085041">Guard</span>
+      <h3>Guard</h3>
+      <p>No knowledge of enemy attacks required. Player takes defensive stance — movement restricted, incoming damage reduced, may reduce negative effects. Viable throughout the entire game though effectiveness decreases at higher difficulties.</p>
+      <div class="skill-row"><span class="skill-name">Basic Block</span><span class="skill-meta">Lv1 · 1pt · -20% damage</span></div>
+      <div class="skill-row"><span class="skill-name">Reinforced Guard</span><span class="skill-meta">Lv5 · 4pt · -30% + debuff resist</span></div>
+      <div class="skill-row"><span class="skill-name">Counter Stance</span><span class="skill-meta">Lv10 · 6pt · reflects 5% ATK</span></div>
+      <div class="skill-row"><span class="skill-name">Master Guard</span><span class="skill-meta">Lv15 · 8pt · stuns weak enemies</span></div>
+      <div class="skill-row"><span class="skill-name">Fortress</span><span class="skill-meta">Lv20 · 12pt · HP regen while guarding</span></div>
+    </div>
+    <div class="sys-card">
+      <span class="sys-tag" style="background:#E6F1FB;color:#0C447C">Dodge</span>
+      <h3>Dodge</h3>
+      <p>Requires understanding of enemy attacks. Real-time avoidance during enemy turn — inputs left, right, jump. Avoids all damage if successful. Full damage taken if failed.</p>
+      <div class="skill-row"><span class="skill-name">Basic Dodge</span><span class="skill-meta">Lv3 · 0pt · unlocks system</span></div>
+      <div class="skill-row"><span class="skill-name">Swift Reflexes</span><span class="skill-meta">Lv6 · 4pt · easier timing</span></div>
+      <div class="skill-row"><span class="skill-name">Punisher Roll</span><span class="skill-meta">Lv12 · 6pt · 5–10% ATK on dodge</span></div>
+      <div class="skill-row"><span class="skill-name">Expert Evasion</span><span class="skill-meta">Lv18 · 8pt · partial hits reduced</span></div>
+      <div class="skill-row"><span class="skill-name">Phantom Step</span><span class="skill-meta">Lv22 · 12pt · evasion bonus after dodge</span></div>
+    </div>
+    <div class="sys-card">
+      <span class="sys-tag" style="background:#FAEEDA;color:#633806">Parry</span>
+      <h3>Parry</h3>
+      <p>Requires precise timing and understanding of attacks. Strict timing window — success negates damage and deals counter damage. Failure increases damage taken 1.3–1.5x. High risk, high reward.</p>
+      <div class="skill-row"><span class="skill-name">Basic Parry</span><span class="skill-meta">Lv8 · 0pt · unlocks system</span></div>
+      <div class="skill-row"><span class="skill-name">Deflect</span><span class="skill-meta">Lv12 · 4pt · -20% follow-up damage</span></div>
+      <div class="skill-row"><span class="skill-name">Riposte</span><span class="skill-meta">Lv16 · 6pt · 25% ATK counter</span></div>
+      <div class="skill-row"><span class="skill-name">Perfect Timing</span><span class="skill-meta">Lv20 · 8pt · tighter window, more damage</span></div>
+      <div class="skill-row"><span class="skill-name">Master Parry</span><span class="skill-meta">Lv25 · 12pt · stun + 1.5x damage</span></div>
+    </div>
+    <div class="sys-card">
+      <span class="sys-tag" style="background:#FCEBEB;color:#A32D2D">Burst</span>
+      <h3>Burst</h3>
+      <p>Requires mastery of enemy timing. Consumes SP/MP. Functions like advanced parry with stricter timing. Success: massive damage, ends enemy turn, +7% accuracy. Failure: stunned, cannot parry, increased damage, cooldown triggered.</p>
+      <div class="skill-row"><span class="skill-name">Burst Strike</span><span class="skill-meta">Lv18 · 12pt · unlocks Burst ability</span></div>
+      <p style="margin-top:0.5rem">Cannot be spammed — gated by level, cost, and cooldown.</p>
+    </div>
+    <div class="sys-card">
+      <span class="sys-tag" style="background:#EEEDFE;color:#3C3489">Bonus Stats</span>
+      <h3>Bonus Stat System</h3>
+      <p>Points earned from enemies: Low-tier 1pt, Mid-tier 3pt, High-tier 5pt, Bosses 10pt. 1 Roll = 4 points.</p>
+      <div class="skill-row"><span class="skill-name">Reinforced</span><span class="skill-meta">+5–15% ATK</span></div>
+      <div class="skill-row"><span class="skill-name">Executioner</span><span class="skill-meta">+5–15% Crit Damage</span></div>
+      <div class="skill-row"><span class="skill-name">Lethal</span><span class="skill-meta">+5–15% Crit Chance</span></div>
+      <p style="margin-top:0.5rem">5–7% = high probability · 8–10% = medium · 11–15% = low</p>
+    </div>
+    <div class="sys-card">
+      <span class="sys-tag" style="background:#EAF3DE;color:#27500A">Skill Points</span>
+      <h3>Skill Point Sources</h3>
+      <p>Points reward player skill, not grinding.</p>
+      <div class="skill-row"><span class="skill-name">Perfect Streaks</span><span class="skill-meta">Consecutive defenses</span></div>
+      <div class="skill-row"><span class="skill-name">Flawless Victory</span><span class="skill-meta">No damage taken · 1–2pt</span></div>
+      <div class="skill-row"><span class="skill-name">Challenge Modes</span><span class="skill-meta">No Guard / No Dodge runs</span></div>
+      <div class="skill-row"><span class="skill-name">Hidden Secrets</span><span class="skill-meta">Exploration rewards</span></div>
+      <div class="skill-row"><span class="skill-name">NPC Quests</span><span class="skill-meta">Optional objectives</span></div>
+      <div class="skill-row"><span class="skill-name">Skill Tomes</span><span class="skill-meta">Consumable items</span></div>
+    </div>
+  </div>
+
+  <p class="phase-label ph-sys" style="margin-bottom:1rem">Magic System</p>
+  <p style="font-size:13px;color:#5f5e5a;margin-bottom:1rem">The five holy magics are the original forms, now extinct. Modern magic was refined from them after the Great Magic War. Dokuri gains each beast magic as he defeats their soul — his magic tree expands with the story. At the merge, all magic is spent on the sealing.</p>
+  <div class="magic-grid">
+    <div class="magic-card" style="background:#E6F1FB;border:1px solid #B5D4F4">
+      <h4 style="color:#0C447C">Water Magic</h4>
+      <p style="color:#185FA5;font-size:12px">Holy magic of the Merfolk. Controls water, tides, fluid movement.</p>
+      <p class="refined" style="color:#185FA5">Refined into: Ice Magic</p>
+      <p style="color:#185FA5;font-size:11px;margin-top:0.3rem">Unlocked: After defeating Naykala (Phase 2)</p>
+    </div>
+    <div class="magic-card" style="background:#EAF3DE;border:1px solid #C0DD97">
+      <h4 style="color:#27500A">Wind Magic</h4>
+      <p style="color:#3B6D11;font-size:12px">Holy magic of the Oranata. Controls air currents, speed, force.</p>
+      <p class="refined" style="color:#3B6D11">Refined into: Electric Magic</p>
+      <p style="color:#3B6D11;font-size:11px;margin-top:0.3rem">Unlocked: After defeating Hisanera (Phase 1)</p>
+    </div>
+    <div class="magic-card" style="background:#FAEEDA;border:1px solid #FAC775">
+      <h4 style="color:#633806">Light Magic</h4>
+      <p style="color:#854F0B;font-size:12px">Holy magic of the Fae. Controls radiance, illusion, revelation.</p>
+      <p class="refined" style="color:#854F0B">Refined into: Fire Magic</p>
+      <p style="color:#854F0B;font-size:11px;margin-top:0.3rem">Unlocked: After defeating Oberon (Phase 2)</p>
+    </div>
+    <div class="magic-card" style="background:#EAF3DE;border:1px solid #C0DD97">
+      <h4 style="color:#27500A">Poison Magic</h4>
+      <p style="color:#3B6D11;font-size:12px">Holy magic of the Naga. Controls toxins, corrosion, affliction.</p>
+      <p class="refined" style="color:#3B6D11">Refined into: Plant Magic</p>
+      <p style="color:#3B6D11;font-size:11px;margin-top:0.3rem">Unlocked: After defeating Tesnata (Phase 1)</p>
+    </div>
+    <div class="magic-card" style="background:#F1EFE8;border:1px solid #B4B2A9">
+      <h4 style="color:#444441">Steel Magic</h4>
+      <p style="color:#5F5E5A;font-size:12px">Holy magic of humans. The first manufactured magic. Dokuri's base ability — enables temple entry.</p>
+      <p class="refined" style="color:#5F5E5A">Refined into: Stone Magic</p>
+      <p style="color:#5F5E5A;font-size:11px;margin-top:0.3rem">Spent sealing Charybdis at the merge — Dokuri gains Stone Magic in its place</p>
+    </div>
+  </div>
+
+  <p class="phase-label ph-sys" style="margin-bottom:1rem">Progression Flow</p>
+  <div class="sys-grid">
+    <div class="sys-card">
+      <h3>Early Game</h3>
+      <p>Guard and basic Dodge dominate. Player learns enemy patterns safely. Steel magic is Dokuri sole tool. First boss unlocks Poison magic from Tesnata.</p>
+    </div>
+    <div class="sys-card">
+      <h3>Mid Game</h3>
+      <p>Dodge becomes more refined. Parry unlock introduces skill expression. Wind magic added after Hisanera. Two magic trees running alongside combat skill tree.</p>
+    </div>
+    <div class="sys-card">
+      <h3>Late Game / Phase 2</h3>
+      <p>Parry mastery and optimization. Burst becomes practical. Light magic after Oberon, Water after Naykala. Four magic trees plus combat system — Dokuri carries all five holy magics simultaneously.</p>
+    </div>
+    <div class="sys-card">
+      <h3>End Game</h3>
+      <p>Players chain Dodge to Parry to Burst. Build optimization through bonus stats. All five magic trees available. At the merge, steel magic is spent sealing Charybdis — all other magic is lost with it. Dokuri gains Stone Magic, the modern refinement of steel, as what remains.</p>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true">
+  <div class="modal" id="modal">
+    <button class="modal-close" id="closeBtn">Close</button>
+    <div id="mc"></div>
+  </div>
+</div>
+
+<script>
+// ── BEAT DATA ──────────────────────────────────────────────────────────────
+const BEATS = {
+'c1_0':{tag:'Beat 01',title:'The Ceremony',secs:[
+  {t:'what',l:'What happens',h:`<p>The game opens mid-ceremony. Dokuri is already standing on the royal platform in Elgrandsburgh main square, dressed in ceremonial armor he has no memory of putting on. A royal official declares to thousands of citizens that the chosen hero has been found — a human with steel magic in their blood who will travel west to end a growing threat. The crowd erupts. Dokuri has no controls.</p>`},
+  {t:'opt',l:'Fae observation',h:`<div class="dlg fae"><span class="spk">The Fae</span>"You don't look like someone who just found out they're a hero."</div><div class="dlg inn"><span class="spk">Dokuri — internal</span>"I don't feel like one."</div>`}
+]},
+'c1_open1':{tag:'Open World',title:'The Royal Quarter — Evening',secs:[
+  {t:'open',l:'Open world period',h:`<div class="open-box">Free movement in the royal quarter and upper city. No time pressure — explore before or after receiving the forest objective.</div>`},
+  {t:'shop',l:'Shops',h:`<div class="shop-box">No shops in the palace quarter. City market district visible but gated until morning.</div>`},
+  {t:'opt',l:'Available content',h:`<p>NPC conversations: palace cook (city feels restless), Naga scholar (gives Grand Pillar lore collectible), young royal guard (mentions ceremony prepared weeks before Dokuri was named — subtle cult tell).</p><div class="collectible">Collectible: Grand Pillar formation account from Naga scholar.</div><p>Balcony plant interaction triggers first Kana fragment.</p>`}
+]},
+'c1_1':{tag:'Beat 02',title:'The Forest Escort',secs:[
+  {t:'what',l:'What happens',h:`<p>Two royal guards walk Dokuri to the Whisper Forest edge at dawn and turn back immediately. The forest is the tutorial zone. Off the main path a light flickers — a prompt invites investigation. In a hollow the Fae is suspended in a magical snare, too precise to be natural. Dokuri dismantles it at personal cost.</p>`},
+  {t:'int',l:'Dokuri watches the guards leave',h:`<div class="dlg inn"><span class="spk">Dokuri — internal</span>"They walked away faster than they walked here."</div><div class="dlg fae"><span class="spk">The Fae</span>"Or they didn't need to ask what was in there because they put it there."</div><div class="dlg"><span class="spk">Dokuri</span>"You've been free for less than a day. Don't make enemies of everyone yet."</div>`},
+  {t:'opt',l:'Forest optional',h:`<p>Wounded traveler side quest — find lost pack. Carved trees collectible — five-pointed figure of the five beasts in unified form, predating Elgrandsburgh.</p>`}
+]},
+'c1_2':{tag:'Beat 03',title:'Tutorial Boss — The Great Oro',secs:[
+  {t:'what',l:'What happens',h:`<p>On the way back out of the forest the Great Oro ambushes Dokuri — a massive babirusa-inspired predator, tusks curving impossibly upward through the skull. Tutorial boss. The Fae, still too weak to stand, speaks into Dokuri mind for the first time during the fight: short practical warnings that cost them visibly.</p>`},
+  {t:'what',l:'After',h:`<div class="dlg inn"><span class="spk">Dokuri — internal</span>"It was just an animal. Someone put it here."</div>`}
+]},
+'c1_3':{tag:'Beat 04',title:'First Contact & Departure',secs:[
+  {t:'what',l:'First contact',h:`<div class="dlg fae"><span class="spk">The Fae</span>"You didn't have to do that. Free me."</div><div class="dlg"><span class="spk">Dokuri</span>"I know."</div><div class="dlg fae"><span class="spk">The Fae</span>"My name doesn't translate. You can call me whatever you like."</div>`},
+  {t:'mus',l:"Kana's motif — first appearance",h:`<div class="motif">Three or four notes. There and gone before they resolve. Arriving with a memory Dokuri did not choose.</div><div class="dlg inn"><span class="spk">Dokuri — internal</span>"She used to hum something like that. I don't remember when."</div>`},
+  {t:'open',l:'Open world: full city before departure',h:`<div class="open-box">Full Elgrandsburgh opens after returning from the forest. Largest open period in the prologue. All five city districts accessible.</div><div class="shop-box">Market district shops open: general goods, provisions, equipment. Full shop inventory available — this is the last full shop access before the Grand Pillar.</div><p>Optional NPCs: Merfolk merchant, Oranata elder (right about water), child at the gate. Departure triggered manually at the city gate — cannot trigger accidentally.</p>`},
+  {t:'int',l:'At the city gate',h:`<div class="dlg inn"><span class="spk">Dokuri — internal</span>"She would have had something to say about all of this. Something that made it smaller."</div><div class="dlg inn"><span class="spk">Dokuri — internal</span>"Day four hundred and twelve."</div>`}
+]},
+'c2_0':{tag:'Beat 01',title:'Arrival & Open World',secs:[
+  {t:'what',l:'What happens',h:`<p>The Grand Pillar is Dokuri former home. The Naga receive him with complicated half-recognition. The settlement carved into the pillar face is open for exploration before Vrael finds him.</p>`},
+  {t:'open',l:'Open world: pillar settlement',h:`<div class="open-box">Settlement levels open on arrival. Explore before Vrael approaches — he finds Dokuri on the training grounds when the player is ready.</div><div class="shop-box">Trade post near lower entrance: equipment and consumables. Smaller selection than Elgrandsburgh market.</div><p>NPCs: young Naga apprentice asks about steel magic. Pillar historian — collectible ledger documents cult-connected deaths Vrael will reference. Naga child conversation.</p><div class="collectible">Collectible: historian ledger. Findable before Vrael speaks — observant players understand what he is about to say.</div>`},
+  {t:'opt',l:'Fae on arrival',h:`<div class="dlg fae"><span class="spk">The Fae</span>"What was it like to grow up here?"</div><div class="dlg"><span class="spk">Dokuri</span>"Loud at night. The wind through the upper caves sounded like something breathing."</div>`}
+]},
+'c2_1':{tag:'Beat 02',title:'Vrael & The Interrupted Truth',secs:[
+  {t:'what',l:'What happens',h:`<p>Vrael crosses to Dokuri on the training grounds without being summoned. He says Dokuri fights like he is trying to end it fast so he does not have to feel it. He brings Dokuri inside and begins telling him about Kana death — the pattern matches cult-connected deaths near the pillar. Before he can explain what this means the walls shudder. Tesnata soul is awake. He sends Dokuri up.</p><div class="dlg"><span class="spk">Vrael</span>"Come back when this is done. I will tell you the rest."</div>`}
+]},
+'c2_2':{tag:'Beat 03',title:'Mini Boss — The Steel-Drawn Thing',secs:[
+  {t:'what',l:'What happens',h:`<p>The cave passages hold a creature drawn specifically to steel magic — barely resolving into a shape, moving with the focused pull of something that found what it was looking for. It fights with the insistence of something reaching rather than hunting. When it goes still it does so slowly, like something winding down.</p>`},
+  {t:'int',l:'After',h:`<div class="dlg inn"><span class="spk">Dokuri — internal</span>"It recognized something. I don't know if that's better or worse."</div>`}
+]},
+'c2_3':{tag:'Beat 04',title:'Boss 1 — Tesnata',secs:[
+  {t:'what',l:'What happens',h:`<p>At the summit Tesnata soul manifests in full. Fast, technically demanding, poison accumulating rather than striking all at once. First major boss fight.</p><div class="dlg"><span class="spk">Tesnata</span>"You smell like the Architect's magic. It makes me sick."</div>`},
+  {t:'magic',l:'Magic unlock',h:`<div class="magic-box">Defeating Tesnata unlocks Poison Magic — the Naga holy magic. New skill tree available. Poison magic controls toxins, corrosion, and affliction effects.</div>`},
+  {t:'what',l:'After',h:`<p>Her soul disperses into the stone of the pillar.</p><div class="dlg fae"><span class="spk">The Fae</span>"That's one."</div>`}
+]},
+'c2_4':{tag:'Beat 05',title:'Vrael Finishes — The Truth About Kana',secs:[
+  {t:'what',l:'What happens',h:`<p>Vrael finishes what he started. The cult did not find Kana through Dokuri — they found Dokuri through Kana. Her family was under surveillance for years. When Dokuri appeared carrying steel magic, the cult transferred attention entirely and Kana was removed as an obstacle. She was not the target. She died because she was near the target.</p><div class="dlg"><span class="spk">Vrael</span>"I think they found her because of you. I think she died because of you."</div><p>He says it without cruelty. That almost makes it worse. Dokuri stands up and leaves.</p>`},
+  {t:'open',l:'Open world: settlement after truth',h:`<div class="open-box">Settlement remains open after Vrael speaks. Tone of NPC conversations shifts slightly. Road west available whenever player is ready.</div><div class="shop-box">Trade post still open before departure.</div><div class="collectible">Collectible: carved figure in Vrael quarters — probably young Dokuri. He does not take it.</div>`}
+]},
+'c3_0':{tag:'Beat 01',title:'World Scar & Bridge Entrance',secs:[
+  {t:'what',l:'What happens',h:`<p>The road from the Grand Pillar runs through open plateau. The Fae distracts Dokuri by talking about the bridge. He mentions Kana sideways: she never wanted to cross it. The World Scar begins without ceremony. The bridge extends from the edge without announcing itself. Dokuri steps onto it.</p><div class="dlg inn"><span class="spk">Dokuri — internal</span>"He cut the world in half to keep out of a war. I used to think that was cowardice."</div>`},
+  {t:'open',l:'Open world: bridge eastern third',h:`<div class="open-box">First third of the bridge open before the cult enforcer checkpoint.</div><div class="shop-box">Trade stalls built into permanent bridge structures: weapons, consumables, goods from across the continent.</div><div class="collectible">Collectible: bridge historian office — account of construction workers reporting a sound from far below. Like something enormous breathing. No follow-up entry.</div>`}
+]},
+'c3_1':{tag:'Beat 02',title:'Mini Boss — Cult Enforcer',secs:[
+  {t:'what',l:'What happens',h:`<p>A cult enforcer at a checkpoint mid-bridge made a decision when he saw Dokuri face. This fight is not random — he was told to watch for this person. The fight blocks the path forward.</p>`}
+]},
+'c3_2':{tag:'Beat 03',title:'Thousandth City — Open',secs:[
+  {t:'open',l:'Open world: Thousandth City',h:`<div class="open-box">Full city access on arrival. Largest shop selection in Phase 1. The gambler is present but does not approach until the player enters the casino district area.</div><div class="shop-box">Largest shop inventory in the game — weapons, armor, consumables, collectibles, upgrades. Casino mini-games available.</div><p>NPCs: Merfolk trader (can be convinced to look over the World Scar edge — pays off in Phase 2). Multiple lore conversations about the bridge and five races. The gambler waits near the casino district.</p>`}
+]},
+'c3_3':{tag:'Beat 04',title:'The Gambler & Hisanera Warning',secs:[
+  {t:'what',l:'The gambler',h:`<p>The gambler finds Dokuri and lays out what forty years of travelers told him: the temple priests said the sealing was holding, no threat existed, no prophecy anybody in the temple had heard of. The Fae confirms he is right. Dokuri says he needs to know what is in the temple more than he needs to be right about who sent him. He keeps walking.</p>`},
+  {t:'what',l:'Hisanera — first warning',h:`<p>Near the western edge of Thousandth City, Hisanera manifests — a horse demi-human carrying the exhaustion of five thousand years. He tells Dokuri to stop once. Plainly. Without heat.</p><div class="dlg"><span class="spk">Hisanera</span>"I'm telling you once — stop."</div><div class="dlg fae"><span class="spk">The Fae</span>"He seemed tired."</div><div class="dlg"><span class="spk">Dokuri</span>"He's been tired for five thousand years. He can rest when this is over."</div>`},
+  {t:'open',l:'Open world: bridge western third',h:`<div class="open-box">Western third of bridge between Thousandth City and Hisanera boss fight. Quieter, fewer structures.</div><div class="shop-box">Reduced shops — a few traveling merchants. Last shop access before the Wastelands.</div>`}
+]},
+'c3_4':{tag:'Beat 05',title:'Boss 2 — Hisanera',secs:[
+  {t:'what',l:'What happens',h:`<p>Hisanera is waiting at the bridge western end. The fight is the fastest and most demanding of Phase 1 — wind magic that does not telegraph, movement crossing the full arena in a single step.</p><div class="dlg"><span class="spk">Hisanera</span>"You fight like someone with nothing left to lose. That's the most dangerous kind of person. And the saddest."</div><div class="dlg inn"><span class="spk">Dokuri — internal</span>"Day four hundred and forty-one."</div>`},
+  {t:'magic',l:'Magic unlock',h:`<div class="magic-box">Defeating Hisanera unlocks Wind Magic — the Oranata holy magic. New skill tree available. Wind magic controls air currents, speed, and force.</div>`}
+]},
+'c4_0':{tag:'Beat 01',title:'Entering the Wastelands',secs:[
+  {t:'what',l:'What happens',h:`<p>The Wasteland begins the moment the bridge ends. The Oranata receive Dokuri with indifference — outsiders pass through and the desert takes them or it doesn't. The further west he travels the more clearly something is wrong: water channels running low, crops failing at roots rather than from drought, ghost blooms appearing near dried channels.</p><div class="dlg inn"><span class="spk">Dokuri — internal</span>"The water didn't stop. Someone stopped it."</div>`},
+  {t:'open',l:'Open world: the Wastelands',h:`<div class="open-box">The Wastelands are the most open area in Phase 1. No single trigger forces progress — Dokuri can explore freely between settlements. The Oranata indifference means nothing pushes him anywhere.</div><div class="shop-box">No formal shops. Oranata traders at settlements will barter provisions. Limited equipment available — focus on consumables for the desert crossing.</div><p>NPCs: Oranata elder (ghost blooms, water side quest entry). Young warrior practicing wind magic — descended from Hisanera fighting style. Hisanera shrine collectible.</p><div class="collectible">Collectible: handwritten prayer at Hisanera shrine asking for rain. Paper is recent.</div>`}
+]},
+'c4_1':{tag:'Beat 02',title:'Side Quest — The Water Channels',secs:[
+  {t:'opt',l:'Side quest',h:`<p>The ghost bloom elder points Dokuri northeast. Following the channel walls reveals a cult engineering structure buried under sand, deliberately diverting Oranata water westward as waste. Running for two years. Dokuri destroys it. Tells no one who built it.</p><div class="dlg fae"><span class="spk">The Fae</span>"It means they've been planning this longer than just you."</div><div class="dlg"><span class="spk">Dokuri</span>"No. Not yet."</div>`},
+  {t:'mus',l:'Kana fragment',h:`<div class="dlg inn"><span class="spk">Dokuri — internal</span>"She would have crouched down to look at it. She would have said things that shouldn't survive always find a way."</div><div class="dlg inn"><span class="spk">Dokuri — internal</span>"Day four hundred and forty-eight."</div>`}
+]},
+'c4_2':{tag:'Beat 03',title:'Mini Boss — Wasteland Predator',secs:[
+  {t:'what',l:'What happens',h:`<p>Dokuri camps alone in the open desert. Before dawn, the silence of something large being very still nearby. The predator fight happens in gold light, the desert floor lit sideways, the creature using shadow and angle deliberately. The Fae narrates position continuously.</p>`},
+  {t:'what',l:'After',h:`<div class="dlg fae"><span class="spk">The Fae</span>"You have a lot of sand in your hair."</div><div class="dlg"><span class="spk">Dokuri</span>"I know."</div>`}
+]},
+'c5_0':{tag:'Beat 01',title:'The Shattering Steppes',secs:[
+  {t:'what',l:'What happens',h:`<p>The Steppes sky fractures as a constant condition. Two priests wait outside the three-hundred-foot temple. The elder tells Dokuri the prophecy is false, the sealing is holding, the Architect is not a threat. She can see he already knows this and asks why he is still walking toward the door.</p><div class="dlg"><span class="spk">Dokuri</span>"Because I need to know what's in there more than I need to be safe about how I find out."</div><div class="dlg"><span class="spk">Elder Priest</span>"Then I cannot stop you. But I am telling you this so that when you understand what you have done you will know that someone tried."</div>`},
+  {t:'open',l:'Open world: Steppes before temple',h:`<div class="open-box">The Steppes settlement is briefly explorable before entering the temple. Sparse — people drawn here for religious reasons. No pressure to enter until ready.</div><div class="shop-box">No shops in the Steppes. Last chance to use any remaining Wasteland provisions.</div>`}
+]},
+'c5_1':{tag:'Beat 02',title:'Entering the Temple',secs:[
+  {t:'what',l:'What happens',h:`<p>The door opens to Dokuri steel magic. The interior is larger than the exterior suggests — vaulted ceilings that should not fit, corridors running further than the floor plan allows. One wall holds a continuous record of every person who served here. The Fae senses the Architect before Dokuri sees him.</p>`},
+  {t:'open',l:'Temple exploration',h:`<div class="open-box">The temple interior is explorable before reaching the central chamber. The corridor of names, the workshop, side rooms — all accessible. The Architect is in the central chamber when the player is ready.</div>`},
+  {t:'opt',l:'Optional content',h:`<div class="collectible">Collectible: priest journal identifying the mark beside certain names — those who knew the full truth. Last used over two thousand years ago.</div><p>The Architect workshop: tools and materials from five thousand years ago, perfectly preserved. The Fae observes he made things people needed.</p><div class="collectible">Collectible: elder priest tells Dokuri to ask the Fae what they know when he is ready. On replay: a warning about the Fae, not a recommendation.</div>`}
+]},
+'c5_2':{tag:'Beat 03',title:'The Architect & The Strike',secs:[
+  {t:'what',l:'What happens',h:`<p>The Architect is in the central chamber, standing, reading Dokuri in one breath. He recognizes the Fae — you survived — then says almost nothing to Dokuri. He says: if I die the world becomes something else. He says: trust the Fae. Then the steel magic responds to the ancient mana in the room and Dokuri strikes.</p>`},
+  {t:'arch',l:'The Architect warns',h:`<div class="dlg arch"><span class="spk">The Architect</span>"I have been here a very long time. Long enough to know what a person looks like when they have already decided."</div><div class="dlg arch"><span class="spk">The Architect</span>"Whatever happens after — the Fae will know what to do. Trust them."</div>`}
+]},
+'c6_0':{tag:'Beat 01',title:'The Strike & Eruption',secs:[
+  {t:'what',l:'What happens',h:`<p>The blow lands. The chamber goes white. Ancient mana vents through the temple walls. The sky above the Shattering Steppes fractures totally — cracks spreading outward until every sky above every region of Alertia shows the same damage. Every person on the continent looks up at the same moment. The corruption begins in the sky and spreads downward.</p>`}
+]},
+'c6_1':{tag:'Beat 02',title:'Confusion & The Architect Falls',secs:[
+  {t:'what',l:'What happens',h:`<p>The conditioning that held Dokuri pointed west for six months breaks apart all at once. The Fae pulls him back: he is still alive. The Architect collapses the moment Dokuri reaches him — as though waiting for someone close enough before allowing it. Dokuri catches him.</p><div class="dlg arch"><span class="spk">The Architect</span>"You caught me. I did not expect that."</div><div class="dlg arch"><span class="spk">The Architect</span>"I watched you for six months. I thought you would be angrier."</div><div class="dlg"><span class="spk">Dokuri</span>"I don't have room for angry yet."</div>`}
+]},
+'c6_2':{tag:'Beat 03',title:'The Beasts Intervene & The Spirit Cat',secs:[
+  {t:'what',l:'The four beasts',h:`<p>Tesnata, Oberon, Hisanera, Naykala appear without announcement — not fully visible, not fully invisible. They absorb the ancient mana venting from the Architect wound. Each pulse dims them. They do not speak. They spend themselves in silence and disperse.</p>`},
+  {t:'what',l:'The spirit cat',h:`<p>From the Architect closing wound comes something small and luminous that has decided to be a cat. It carries subtle physical traces of all four races. It steps through the air and lands on Dokuri shoulder.</p><div class="dlg fae"><span class="spk">The Fae</span>"I think it chose you."</div><div class="dlg"><span class="spk">Dokuri</span>"Ask me when I figure out how I feel about any of this."</div>`},
+  {t:'opt',l:'Optional — the cage',h:`<div class="collectible">Collectible: the Fae original cage from the Whisper Forest is in the chamber. The Architect had it brought here. Attached: "They used your kindness against you. That is not your fault."</div>`}
+]},
+'c7_0':{tag:'Beat 01',title:'Empty Steppes & Broken Geometry',secs:[
+  {t:'what',l:'What happens',h:`<p>Dokuri carries the Architect out of the temple into empty Steppes. Within a mile the landscape disagrees with itself — paths curving wrong, shadows toward light sources, plateau sections folding upward at right angles. The player navigates by following the spirit cat, which moves through broken geometry with complete confidence.</p>`},
+  {t:'what',l:'The mind channel infiltrated',h:`<p>Dokuri starts hearing things in the Fae voice that the Fae is not saying. When discovered they establish a rule: physical contact confirms the real voice. The Fae rests two fingers against Dokuri jaw.</p><div class="dlg fae"><span class="spk">The Fae</span>"If you hear my voice without me touching you, it isn't me."</div>`}
+]},
+'c7_1':{tag:'Beat 02',title:'Boss 3 — Oberon',secs:[
+  {t:'what',l:'What happens',h:`<p>Oberon manifests standing on plateau tilted forty-five degrees, treating it as natural. He looks at the Fae: there you are. I wondered where they put you. Boss fight: fast and theatrical, light magic arriving in shapes beautiful and deeply wrong simultaneously. The physical contact rule neutralizes his primary tool.</p><div class="dlg"><span class="spk">Oberon</span>"I wasn't trying to stop you. None of us were. We just wanted someone to make it difficult."</div>`},
+  {t:'magic',l:'Magic unlock',h:`<div class="magic-box">Defeating Oberon unlocks Light Magic — the Fae holy magic. New skill tree available. Light magic controls radiance, illusion, and revelation. Note: the Fae carries this same magic — their fighting assistance in earlier chapters draws from this lineage.</div>`},
+  {t:'opt',l:'After — Oberon and the Fae',h:`<div class="dlg fae"><span class="spk">The Fae</span>"He knew my real name. The one that doesn't translate. It felt like being recognized by something with no reason to recognize you kindly."</div><div class="dlg"><span class="spk">Dokuri</span>"Did you know him?"</div><div class="dlg fae"><span class="spk">The Fae</span>"All Fae knew Oberon. He was our king. Before everything. Yes."</div><p>On replay: not lore. The closest admission of what the Fae is.</p>`}
+]},
+'c8_0':{tag:'Beat 01',title:'Descending into the World Scar Basin',secs:[
+  {t:'what',l:'What happens',h:`<p>The corruption geometry has folded the escarpment wall inward. The player descends. The basin floor is not water — the dead are so numerous they float above it. Merfolk almost entirely. The spirit cat refuses to walk here. Dokuri carries it.</p>`},
+  {t:'open',l:'Open world: the basin',h:`<div class="open-box">The basin is the most explorable area in Phase 2. Ancient ruins carved into the chasm walls, the dry waterfall site, the eastern camp area — all accessible. No pressure to move toward Naykala until ready.</div><div class="shop-box">No shops. Scavengeable goods from bridge traders caught in the mana surge — limited consumables findable in the eastern sections.</div>`}
+]},
+'c8_1':{tag:'Beat 02',title:"The Merfolk Trader's Belongings",secs:[
+  {t:'mus',l:'Emotional beat',h:`<p>In the eastern third of the basin the player finds the belongings of the Merfolk trader from Phase 1 — the woman who said she had never looked over the edge. Her trade charts, a folded cloth keepsake Dokuri does not open.</p><div class="dlg fae"><span class="spk">The Fae</span>"She looked over the edge. In Phase 1. She said she never had."</div><div class="dlg"><span class="spk">Dokuri</span>"I know."</div><div class="dlg fae"><span class="spk">The Fae</span>"I'm glad she did."</div><div class="dlg inn"><span class="spk">Dokuri — internal</span>"Day four hundred and sixty-three."</div>`},
+  {t:'opt',l:'Ancient ruins',h:`<p>Ruins along chasm walls reveal a civilization predating the bridge by thousands of years — living in the valley before the Architect created the World Scar.</p><div class="dlg arch"><span class="spk">The Architect</span>"I didn't know anyone lived in the valley. I should have looked."</div><div class="collectible">Collectible: deepest chamber carving — oldest known depiction of Charybdis fragmented form. Predates the Great Magic War. Who made it is unknown.</div>`}
+]},
+'c8_2':{tag:'Beat 03',title:'Boss 4 — Naykala',secs:[
+  {t:'what',l:'What happens',h:`<p>Naykala manifests moving through the dead — she cannot tell the dead from the living anymore. She notices Dokuri and says: you are walking on my people. He says: I know. I am sorry. She looks at the Architect: he is still alive. Then: I wanted the world back. This isn't the world back. Boss fight: water magic that does not respect the absence of water.</p><div class="dlg"><span class="spk">Naykala</span>"Tell him — never mind. He knows."</div><div class="dlg arch"><span class="spk">The Architect</span>"I know."</div>`},
+  {t:'magic',l:'Magic unlock',h:`<div class="magic-box">Defeating Naykala unlocks Water Magic — the Merfolk holy magic. Final magic tree available. Water magic controls tides, fluid movement, and pressure. Dokuri now carries all five holy magics simultaneously — the same configuration as Charybdis before fragmentation.</div>`}
+]},
+'c9_0':{tag:'Beat 01',title:'Corrupted Grand Pillar',secs:[
+  {t:'what',l:'What happens',h:`<p>The Grand Pillar has grown — stone magic running without direction adds to it continuously in pale unarchitectural formations. A handful of Naga watch from upper levels without descending. Vrael is on the training grounds, his grief and anger now external and visible as actual pressure in the air around him.</p>`},
+  {t:'open',l:'Open world: corrupted pillar',h:`<div class="open-box">The accessible settlement levels are open. Tone is heavier than Phase 1. Naga who stayed can be spoken to. Vrael quarters revisitable after the conversation.</div><div class="shop-box">No active shops. Some scavengeable goods in abandoned quarters.</div><div class="collectible">Revisit: the cup from Phase 1 is still on Vrael table, untouched. Drinking it is optional.</div>`}
+]},
+'c9_1':{tag:'Beat 02',title:"Vrael's Full Truth",secs:[
+  {t:'what',l:'What happens',h:`<p>Vrael finishes what he could not before and goes further. The cult did not find Kana through Dokuri. They found Dokuri through Kana. She was not the target. The word in the cult record was assets to be managed. Dokuri sits with this. The spirit cat is in his lap with his hand on its back without him noticing he placed it there.</p><div class="dlg"><span class="spk">Vrael</span>"Get him there. And when this is over — she would have liked who the road made you."</div>`}
+]},
+'c9_2':{tag:'Beat 03',title:'Mini Boss — Corrupted Naga Warrior',secs:[
+  {t:'what',l:'What happens',h:`<p>A corrupted Naga warrior blocks the path south — one whose emotions were touched by the corruption the same way Vrael was but without Vrael control. The grief and anger are not around them anymore. They are them. The fight is harder than a standard mini boss.</p><div class="dlg inn"><span class="spk">Dokuri — internal</span>"That's what it looks like from the outside. All this time."</div>`}
+]},
+'c10_0':{tag:'Beat 01',title:'Corrupted Elgrandsburgh',secs:[
+  {t:'what',l:'What happens',h:`<p>Elgrandsburgh has become a beacon. The mana lines converging beneath the city draw the corruption creatures toward the convergence point. The city stands. The corruption has learned its streets. The personal details of ordinary life are preserved inside something that has eaten the humans out of them.</p>`},
+  {t:'open',l:'Open world: corrupted city',h:`<div class="open-box">The city can be explored before reaching the main square. Entering the square area triggers the motif — the player will hear it before they see what caused it.</div><div class="shop-box">No active shops. Some scavengeable goods in the market district ruins.</div><p>Revisitable: royal quarter balcony — the plant has bloomed. City gate — where Dokuri said day four hundred and twelve. Palace throne room — cult planning document collectible.</p><div class="collectible">Collectible: palace planning document listing Kana family under early surveillance targets. The language is administrative. The language is the worst part.</div>`}
+]},
+'c10_1':{tag:'Beat 02',title:'Mini Boss — Corrupted Royal Guard',secs:[
+  {t:'what',l:'What happens',h:`<p>The corrupted royal guard is in the main square — last cult soldier, twisted by ancient mana. There is enough recognition in his eyes to make the fight sad. After he falls Dokuri continues across the square.</p><div class="dlg inn"><span class="spk">Dokuri — internal</span>"He was the nervous one. Outside my chamber on the first night. He told me about the ceremony preparations."</div>`}
+]},
+'c10_2':{tag:'Beat 03',title:"Kana's Motif & The Fight",secs:[
+  {t:'mus',l:"Kana's motif",h:`<div class="motif">Twenty feet from the square exit. Three notes. From the air, or from inside him. He turns toward the ceremonial platform. She is standing there, transformed, playing the motif without knowing she is doing it.</div>`},
+  {t:'what',l:'The fight',h:`<p>The fight is the hardest of Phase 2. The motif plays fully inverted throughout. The Fae does not fight — they sit at the base of the platform with the spirit cat, being present for what Dokuri is going through. When the corruption peaks the spirit cat walks onto the platform and places its head against Kana hand. The beast energy moves into her quietly. The motif resolves. Three notes. Then silence. Kana sits down. The corruption leaves her.</p>`}
+]},
+'c10_3':{tag:'Beat 04',title:'One Last Night',secs:[
+  {t:'what',l:'What happens',h:`<p>They stay in the square through the night. The spirit cat purification has disrupted the beacon pull. Kana asks about the scars. Dokuri: I counted the days. Kana: I know. He tells her about the journey. He tells her what Vrael told him. She says: I knew they were watching us. I thought it was something I had done.</p>`},
+  {t:'what',l:'Near dawn',h:`<div class="dlg"><span class="spk">Kana</span>"I don't want you to count anymore. Not because it dishonored me. But because it kept the wound open."</div><div class="dlg"><span class="spk">Dokuri</span>"I don't know what I do with the space."</div><div class="dlg"><span class="spk">Kana</span>"I think you already know. You've been filling it for a while."</div><p>She says his name once in the specific inflection she used when he was being stubborn. Then she is not there.</p>`,},
+  {t:'open',l:'The night — free time',h:`<div class="open-box">The night with Kana has no timer, no objectives, no pressure. The player can simply stay. This freedom is itself a statement. The departure to the temple is triggered manually when the player is ready.</div>`}
+]},
+'c11_0':{tag:'Beat 01',title:'The Road Back & Partial Form',secs:[
+  {t:'what',l:'The road',h:`<p>They leave at corrupted dawn. On the road through broken geometry the spirit cat pauses and looks at the Fae with attention different from how it looks at Dokuri. The Fae meets the gaze and looks away first. Dokuri does not notice.</p>`},
+  {t:'what',l:'The partial form',h:`<p>The temple is standing. The door opens one last time. In the central chamber ancient mana has pooled into a partial form — four overlapping incomplete impressions of the beast souls, filling with mana, circling with the gravity of things that belong together. Boss fight: all four fighting styles shifting mid-attack because it has not yet decided what it is. The spirit cat weakens it throughout.</p>`}
+]},
+'c11_1':{tag:'Beat 02',title:'Charybdis & The Betrayal',secs:[
+  {t:'what',l:'Charybdis emerges',h:`<p>When the partial form collapses Charybdis emerges complete. They look at Dokuri then past him, through him, at the Architect.</p><div class="dlg arch" style="border-left-color:#E24B4A;color:#791F1F"><span class="spk">Charybdis</span>"You split me into four. Four things that forgot what they were."</div><div class="dlg arch"><span class="spk">The Architect</span>"That was necessary."</div><div class="dlg arch" style="border-left-color:#E24B4A;color:#791F1F"><span class="spk">Charybdis</span>"Those aren't different things."</div>`},
+  {t:'what',l:'The betrayal',h:`<p>The fight begins. Then Charybdis looks at the Fae and says: it is time. The Fae removes their hand. The mind-channel goes silent — not from Oberon interference but because the Fae chose to close it. They step toward Charybdis. They were built for this: their bloodline carries the memory of what the world was before Charybdis was sealed. With that memory returned, Charybdis would be made whole without the seal breaking.</p><p>Every act of loyalty across the journey was, from one angle, the act of a weapon deployed toward this purpose.</p>`},
+  {t:'what',l:'The choice',h:`<p>The spirit cat walks to the Fae and sits at their feet without accusation. The Fae light fluctuates once. Charybdis tells them to come.</p><div class="dlg fae"><span class="spk">The Fae</span>Into the closed channel, to Dokuri alone: "She said things that shouldn't survive always find a way."</div><div class="dlg fae"><span class="spk">The Fae</span>To Charybdis: "I know what I was made for. I am choosing something else."</div>`}
+]},
+'c11_2':{tag:'Beat 03',title:'The Merge & The Ending',secs:[
+  {t:'what',l:'The merge',h:`<p>The Architect says: now. The merge is quiet — the Architect presence enters Dokuri as addition rather than erasure. A second set of memories. A second perspective on five thousand years. The steel magic pours into the sealing. The ancient mana finds the seal reestablished. The light fades. The chamber is quiet.</p>`},
+  {t:'what',l:'After',h:`<div class="dlg fae"><span class="spk">The Fae</span>"Are you still you?"</div><div class="dlg"><span class="spk">Dokuri</span>"I'm more than I was. I'm still me."</div><div class="dlg fae"><span class="spk">The Fae</span>"Good."</div><div class="dlg inn"><span class="spk">Dokuri — internal</span>"Day one."</div><p>He stands. The spirit cat relocates to his shoulder — nearly translucent but present. The Fae rises beside him. Through the open temple door: the Steppes, still corrupted, the sky still fractured. It will take time. The sealing does not undo what was done. It only prevents what would have been worse. Dokuri walks toward the door. The Fae walks beside him. The spirit cat rides his shoulder. The world is diminished and free and it is morning and he walks out into it.</p>`}
+]}
+};
+
+// ── CHAPTERS ──────────────────────────────────────────────────────────────
+const CHAPTERS = [
+  { id:'c1', phase:'p1', num:'Chapter 1', title:'Prologue — Elgrandsburgh',
+    sub:'Dokuri wakes mid-ceremony. The Fae is found and freed. The Great Oro is defeated.',
+    tags:['boss','open','shop'],
+    beats:['c1_0','c1_open1','c1_1','c1_2','c1_3'],
+    svg:`<svg width="100%" viewBox="0 0 680 740" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="ar-g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#3B6D11" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="ar-a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#854F0B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-gray"><rect x="180" y="20" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="42" text-anchor="middle" dominant-baseline="central">Prologue &amp; Elgrandsburgh</text></g>
+<g class="node c-pink" data-beat="c1_0" tabindex="0"><rect x="190" y="78" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="99" text-anchor="middle" dominant-baseline="central">Beat 01 — The Ceremony</text><text class="ts" x="340" y="118" text-anchor="middle" dominant-baseline="central">Already named hero — no controls</text></g>
+<line x1="340" y1="134" x2="340" y2="158" class="arr" marker-end="url(#ar)"/>
+<g class="node c-green" data-beat="c1_open1" tabindex="0"><rect x="190" y="158" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="179" text-anchor="middle" dominant-baseline="central">Open World — Royal Quarter</text><text class="ts" x="340" y="198" text-anchor="middle" dominant-baseline="central">Evening exploration — no shops yet</text></g>
+<line x1="340" y1="214" x2="340" y2="238" class="arr" marker-end="url(#ar)"/>
+<g class="node c-blue" data-beat="c1_1" tabindex="0"><rect x="190" y="238" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="259" text-anchor="middle" dominant-baseline="central">Beat 02 — The Forest Escort</text><text class="ts" x="340" y="278" text-anchor="middle" dominant-baseline="central">Guards leave fast — Fae found in snare</text></g>
+<line x1="340" y1="294" x2="340" y2="318" class="arr" marker-end="url(#ar)"/>
+<g class="node c-red" data-beat="c1_2" tabindex="0"><rect x="170" y="318" width="340" height="56" rx="8" stroke-width="1"/><text class="th" x="340" y="339" text-anchor="middle" dominant-baseline="central">Tutorial Boss — The Great Oro</text><text class="ts" x="340" y="358" text-anchor="middle" dominant-baseline="central">Fae speaks for first time — three notes</text></g>
+<line x1="340" y1="374" x2="340" y2="398" class="arr" marker-end="url(#ar)"/>
+<g class="node c-green" data-beat="c1_3" tabindex="0"><rect x="190" y="398" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="419" text-anchor="middle" dominant-baseline="central">Beat 03 — First Contact &amp; Departure</text><text class="ts" x="340" y="438" text-anchor="middle" dominant-baseline="central">Full city open — shops open — Day 412</text></g>
+<line x1="340" y1="454" x2="340" y2="478" class="arr" marker-end="url(#ar)"/>
+<g class="c-teal"><rect x="180" y="478" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="500" text-anchor="middle" dominant-baseline="central">Journey west begins</text></g>
+<text class="ts" x="76" y="300" text-anchor="middle" fill="#72243E" transform="rotate(-90,76,300)">Prologue</text>
+<line x1="100" y1="78" x2="100" y2="454" stroke="#72243E" stroke-width="0.5" stroke-dasharray="4 3"/></svg>`
+  },
+  { id:'c2', phase:'p1', num:'Chapter 2', title:'The Eastern Grand Pillar',
+    sub:'Vrael reveals the partial truth. Tesnata defeated. Poison magic unlocked.',
+    tags:['boss','open','shop','magic'],
+    beats:['c2_0','c2_1','c2_2','c2_3','c2_4'],
+    svg:`<svg width="100%" viewBox="0 0 680 740" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="ar-a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#854F0B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-gray"><rect x="180" y="20" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="42" text-anchor="middle" dominant-baseline="central">The Eastern Grand Pillar</text></g>
+<g class="node c-green" data-beat="c2_0" tabindex="0"><rect x="190" y="78" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="99" text-anchor="middle" dominant-baseline="central">Arrival &amp; Open World</text><text class="ts" x="340" y="118" text-anchor="middle" dominant-baseline="central">Settlement open — trade post shop</text></g>
+<line x1="340" y1="134" x2="340" y2="158" class="arr" marker-end="url(#ar)"/>
+<g class="node c-pink" data-beat="c2_1" tabindex="0"><rect x="190" y="158" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="179" text-anchor="middle" dominant-baseline="central">Beat 01 — Vrael &amp; The Interrupted Truth</text><text class="ts" x="340" y="198" text-anchor="middle" dominant-baseline="central">Kana death pattern — Tesnata interrupts</text></g>
+<line x1="340" y1="214" x2="340" y2="238" class="arr" marker-end="url(#ar)"/>
+<g class="node c-amber" data-beat="c2_2" tabindex="0"><rect x="190" y="238" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="259" text-anchor="middle" dominant-baseline="central">Mini Boss — The Steel-Drawn Thing</text><text class="ts" x="340" y="278" text-anchor="middle" dominant-baseline="central">Drawn to steel magic — confused by it</text></g>
+<line x1="340" y1="294" x2="340" y2="318" class="arr" marker-end="url(#ar)"/>
+<g class="node c-red" data-beat="c2_3" tabindex="0"><rect x="170" y="318" width="340" height="56" rx="8" stroke-width="1"/><text class="th" x="340" y="339" text-anchor="middle" dominant-baseline="central">Boss 1 — Tesnata</text><text class="ts" x="340" y="358" text-anchor="middle" dominant-baseline="central">Summit fight — poison magic unlocked</text></g>
+<line x1="340" y1="374" x2="340" y2="398" class="arr" marker-end="url(#ar)"/>
+<g class="node c-pink" data-beat="c2_4" tabindex="0"><rect x="190" y="398" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="419" text-anchor="middle" dominant-baseline="central">Beat 02 — Vrael Finishes</text><text class="ts" x="340" y="438" text-anchor="middle" dominant-baseline="central">They found Dokuri through Kana</text></g>
+<line x1="340" y1="454" x2="340" y2="478" class="arr" marker-end="url(#ar)"/>
+<g class="c-teal"><rect x="180" y="478" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="500" text-anchor="middle" dominant-baseline="central">Road to the World Scar</text></g></svg>`
+  },
+  { id:'c3', phase:'p1', num:'Chapter 3', title:'The World Scar & Bridge',
+    sub:'The gambler tells the truth. Hisanera warns then fights. Wind magic unlocked.',
+    tags:['boss','open','shop','magic'],
+    beats:['c3_0','c3_1','c3_2','c3_3','c3_4'],
+    svg:`<svg width="100%" viewBox="0 0 680 820" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-gray"><rect x="180" y="20" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="42" text-anchor="middle" dominant-baseline="central">The World Scar &amp; Bridge</text></g>
+<g class="node c-green" data-beat="c3_0" tabindex="0"><rect x="190" y="78" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="99" text-anchor="middle" dominant-baseline="central">World Scar &amp; Bridge Entrance</text><text class="ts" x="340" y="118" text-anchor="middle" dominant-baseline="central">Bridge east third open — trade stalls</text></g>
+<line x1="340" y1="134" x2="340" y2="158" class="arr" marker-end="url(#ar)"/>
+<g class="node c-amber" data-beat="c3_1" tabindex="0"><rect x="190" y="158" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="179" text-anchor="middle" dominant-baseline="central">Mini Boss — Cult Enforcer</text><text class="ts" x="340" y="198" text-anchor="middle" dominant-baseline="central">Not random — he was told to watch for you</text></g>
+<line x1="340" y1="214" x2="340" y2="238" class="arr" marker-end="url(#ar)"/>
+<g class="node c-green" data-beat="c3_2" tabindex="0"><rect x="190" y="238" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="259" text-anchor="middle" dominant-baseline="central">Open World — Thousandth City</text><text class="ts" x="340" y="278" text-anchor="middle" dominant-baseline="central">Largest shops in game — casinos open</text></g>
+<line x1="340" y1="294" x2="340" y2="318" class="arr" marker-end="url(#ar)"/>
+<g class="node c-blue" data-beat="c3_3" tabindex="0"><rect x="190" y="318" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="339" text-anchor="middle" dominant-baseline="central">Beat 01 — Gambler &amp; Hisanera Warning</text><text class="ts" x="340" y="358" text-anchor="middle" dominant-baseline="central">Truth laid out — Dokuri goes west anyway</text></g>
+<line x1="340" y1="374" x2="340" y2="398" class="arr" marker-end="url(#ar)"/>
+<g class="node c-red" data-beat="c3_4" tabindex="0"><rect x="170" y="398" width="340" height="56" rx="8" stroke-width="1"/><text class="th" x="340" y="419" text-anchor="middle" dominant-baseline="central">Boss 2 — Hisanera</text><text class="ts" x="340" y="438" text-anchor="middle" dominant-baseline="central">Bridge end — wind magic unlocked — Day 441</text></g>
+<line x1="340" y1="454" x2="340" y2="478" class="arr" marker-end="url(#ar)"/>
+<g class="c-teal"><rect x="180" y="478" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="500" text-anchor="middle" dominant-baseline="central">Into the Western Wastelands</text></g></svg>`
+  },
+  { id:'c4', phase:'p1', num:'Chapter 4', title:'The Western Wastelands',
+    sub:'Cult water diversion discovered. Side quest. Dawn predator fight.',
+    tags:['open'],
+    beats:['c4_0','c4_1','c4_2'],
+    svg:`<svg width="100%" viewBox="0 0 680 620" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-gray"><rect x="180" y="20" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="42" text-anchor="middle" dominant-baseline="central">The Western Wastelands</text></g>
+<g class="node c-green" data-beat="c4_0" tabindex="0"><rect x="190" y="78" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="99" text-anchor="middle" dominant-baseline="central">Entering the Wastelands</text><text class="ts" x="340" y="118" text-anchor="middle" dominant-baseline="central">Most open area in Phase 1 — barter only</text></g>
+<line x1="340" y1="134" x2="340" y2="158" class="arr" marker-end="url(#ar)"/>
+<g class="node c-pink" data-beat="c4_1" tabindex="0"><rect x="190" y="158" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="179" text-anchor="middle" dominant-baseline="central">Side Quest — Water Channels</text><text class="ts" x="340" y="198" text-anchor="middle" dominant-baseline="central">Cult diversion found and destroyed — Day 448</text></g>
+<line x1="340" y1="214" x2="340" y2="238" class="arr" marker-end="url(#ar)"/>
+<g class="node c-red" data-beat="c4_2" tabindex="0"><rect x="170" y="238" width="340" height="56" rx="8" stroke-width="1"/><text class="th" x="340" y="259" text-anchor="middle" dominant-baseline="central">Mini Boss — Wasteland Predator</text><text class="ts" x="340" y="278" text-anchor="middle" dominant-baseline="central">Dawn fight — gold light — Fae narrates</text></g>
+<line x1="340" y1="294" x2="340" y2="318" class="arr" marker-end="url(#ar)"/>
+<g class="c-teal"><rect x="180" y="318" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="340" text-anchor="middle" dominant-baseline="central">Into the Shattering Steppes</text></g></svg>`
+  },
+  { id:'c5', phase:'p1', num:'Chapter 5', title:'The Shattering Steppes & Temple',
+    sub:'Priests warn him. He enters anyway. The Architect says almost nothing. Dokuri strikes.',
+    tags:['open'],
+    beats:['c5_0','c5_1','c5_2'],
+    svg:`<svg width="100%" viewBox="0 0 680 620" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-gray"><rect x="180" y="20" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="42" text-anchor="middle" dominant-baseline="central">The Shattering Steppes &amp; Temple</text></g>
+<g class="node c-green" data-beat="c5_0" tabindex="0"><rect x="190" y="78" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="99" text-anchor="middle" dominant-baseline="central">The Steppes &amp; Priests Warning</text><text class="ts" x="340" y="118" text-anchor="middle" dominant-baseline="central">Steppes open — no shops — priests try to stop him</text></g>
+<line x1="340" y1="134" x2="340" y2="158" class="arr" marker-end="url(#ar)"/>
+<g class="node c-purple" data-beat="c5_1" tabindex="0"><rect x="190" y="158" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="179" text-anchor="middle" dominant-baseline="central">Entering the Temple</text><text class="ts" x="340" y="198" text-anchor="middle" dominant-baseline="central">Larger inside — corridor of names — explore freely</text></g>
+<line x1="340" y1="214" x2="340" y2="238" class="arr" marker-end="url(#ar)"/>
+<g class="node c-purple" data-beat="c5_2" tabindex="0"><rect x="170" y="238" width="340" height="56" rx="8" stroke-width="1"/><text class="th" x="340" y="259" text-anchor="middle" dominant-baseline="central">The Architect &amp; The Strike</text><text class="ts" x="340" y="278" text-anchor="middle" dominant-baseline="central">He says almost nothing — it is already too late</text></g>
+<line x1="340" y1="294" x2="340" y2="318" class="arr" marker-end="url(#ar)"/>
+<g class="c-red"><rect x="180" y="318" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="340" text-anchor="middle" dominant-baseline="central">The Turning Point</text></g></svg>`
+  },
+  { id:'c6', phase:'turn', num:'Chapter 6', title:'The Turning Point',
+    sub:'The sky fractures. The Architect falls. The beasts intervene. The spirit cat is born.',
+    tags:['turn'],
+    beats:['c6_0','c6_1','c6_2'],
+    svg:`<svg width="100%" viewBox="0 0 680 540" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-red"><rect x="180" y="20" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="42" text-anchor="middle" dominant-baseline="central">The Turning Point — no open world</text></g>
+<g class="node c-red" data-beat="c6_0" tabindex="0"><rect x="190" y="78" width="300" height="56" rx="8" stroke-width="1"/><text class="th" x="340" y="99" text-anchor="middle" dominant-baseline="central">Beat 01 — The Strike &amp; Eruption</text><text class="ts" x="340" y="118" text-anchor="middle" dominant-baseline="central">Every sky in Alertia fractures at once</text></g>
+<line x1="340" y1="134" x2="340" y2="158" class="arr" marker-end="url(#ar)"/>
+<g class="node c-purple" data-beat="c6_1" tabindex="0"><rect x="190" y="158" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="179" text-anchor="middle" dominant-baseline="central">Beat 02 — Confusion &amp; The Architect Falls</text><text class="ts" x="340" y="198" text-anchor="middle" dominant-baseline="central">Conditioning breaks — Dokuri catches him</text></g>
+<line x1="340" y1="214" x2="340" y2="238" class="arr" marker-end="url(#ar)"/>
+<g class="node c-green" data-beat="c6_2" tabindex="0"><rect x="190" y="238" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="259" text-anchor="middle" dominant-baseline="central">Beat 03 — Beasts Intervene &amp; Spirit Cat Born</text><text class="ts" x="340" y="278" text-anchor="middle" dominant-baseline="central">Four souls spend themselves — cat chooses Dokuri</text></g>
+<line x1="340" y1="294" x2="340" y2="318" class="arr" marker-end="url(#ar)"/>
+<g class="c-coral"><rect x="180" y="318" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="340" text-anchor="middle" dominant-baseline="central">Phase 2 begins — the corrupted world</text></g></svg>`
+  },
+  { id:'c7', phase:'p2', num:'Chapter 7', title:'Corrupted Steppes & Oberon',
+    sub:'Broken geometry. Mind channel infiltrated. Oberon defeated. Light magic unlocked.',
+    tags:['boss','magic'],
+    beats:['c7_0','c7_1'],
+    svg:`<svg width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#993C1D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-red"><rect x="180" y="20" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="42" text-anchor="middle" dominant-baseline="central">Corrupted Shattering Steppes</text></g>
+<g class="node c-coral" data-beat="c7_0" tabindex="0"><rect x="190" y="78" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="99" text-anchor="middle" dominant-baseline="central">Beat 01 — Empty Steppes &amp; Broken Geometry</text><text class="ts" x="340" y="118" text-anchor="middle" dominant-baseline="central">Navigate by following the spirit cat</text></g>
+<line x1="340" y1="134" x2="340" y2="158" stroke="#993C1D" stroke-width="1.5" marker-end="url(#ar)"/>
+<g class="node c-red" data-beat="c7_1" tabindex="0"><rect x="170" y="158" width="340" height="56" rx="8" stroke-width="1"/><text class="th" x="340" y="179" text-anchor="middle" dominant-baseline="central">Boss 3 — Oberon</text><text class="ts" x="340" y="198" text-anchor="middle" dominant-baseline="central">Fast and theatrical — light magic unlocked</text></g>
+<line x1="340" y1="214" x2="340" y2="238" stroke="#993C1D" stroke-width="1.5" marker-end="url(#ar)"/>
+<g class="c-coral"><rect x="180" y="238" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="260" text-anchor="middle" dominant-baseline="central">Descend into the World Scar basin</text></g></svg>`
+  },
+  { id:'c8', phase:'p2', num:'Chapter 8', title:'The World Scar Basin & Naykala',
+    sub:'The basin of the dead. Trader belongings found. Naykala defeated. Water magic unlocked.',
+    tags:['boss','open','magic'],
+    beats:['c8_0','c8_1','c8_2'],
+    svg:`<svg width="100%" viewBox="0 0 680 540" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#993C1D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-red"><rect x="180" y="20" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="42" text-anchor="middle" dominant-baseline="central">The World Scar Basin</text></g>
+<g class="node c-green" data-beat="c8_0" tabindex="0"><rect x="190" y="78" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="99" text-anchor="middle" dominant-baseline="central">Descending — Open World</text><text class="ts" x="340" y="118" text-anchor="middle" dominant-baseline="central">Most explorable Phase 2 area — no shops</text></g>
+<line x1="340" y1="134" x2="340" y2="158" stroke="#993C1D" stroke-width="1.5" marker-end="url(#ar)"/>
+<g class="node c-pink" data-beat="c8_1" tabindex="0"><rect x="190" y="158" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="179" text-anchor="middle" dominant-baseline="central">The Trader Belongings — Day 463</text><text class="ts" x="340" y="198" text-anchor="middle" dominant-baseline="central">Ancient ruins — proto-Merfolk civilization</text></g>
+<line x1="340" y1="214" x2="340" y2="238" stroke="#993C1D" stroke-width="1.5" marker-end="url(#ar)"/>
+<g class="node c-red" data-beat="c8_2" tabindex="0"><rect x="170" y="238" width="340" height="56" rx="8" stroke-width="1"/><text class="th" x="340" y="259" text-anchor="middle" dominant-baseline="central">Boss 4 — Naykala</text><text class="ts" x="340" y="278" text-anchor="middle" dominant-baseline="central">All five holy magics now held — water unlocked</text></g>
+<line x1="340" y1="294" x2="340" y2="318" stroke="#993C1D" stroke-width="1.5" marker-end="url(#ar)"/>
+<g class="c-coral"><rect x="180" y="318" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="340" text-anchor="middle" dominant-baseline="central">Climb east — toward the Grand Pillar</text></g></svg>`
+  },
+  { id:'c9', phase:'p2', num:'Chapter 9', title:'Corrupted Grand Pillar & Vrael',
+    sub:'Vrael tells the full truth. Corrupted warrior mini boss.',
+    tags:['open'],
+    beats:['c9_0','c9_1','c9_2'],
+    svg:`<svg width="100%" viewBox="0 0 680 540" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#993C1D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-red"><rect x="180" y="20" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="42" text-anchor="middle" dominant-baseline="central">Corrupted Grand Pillar</text></g>
+<g class="node c-green" data-beat="c9_0" tabindex="0"><rect x="190" y="78" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="99" text-anchor="middle" dominant-baseline="central">Arrival &amp; Open World</text><text class="ts" x="340" y="118" text-anchor="middle" dominant-baseline="central">Settlement levels open — no active shops</text></g>
+<line x1="340" y1="134" x2="340" y2="158" stroke="#993C1D" stroke-width="1.5" marker-end="url(#ar)"/>
+<g class="node c-pink" data-beat="c9_1" tabindex="0"><rect x="190" y="158" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="179" text-anchor="middle" dominant-baseline="central">Beat 01 — Vrael Full Truth</text><text class="ts" x="340" y="198" text-anchor="middle" dominant-baseline="central">Assets to be managed — the weight was wrong</text></g>
+<line x1="340" y1="214" x2="340" y2="238" stroke="#993C1D" stroke-width="1.5" marker-end="url(#ar)"/>
+<g class="node c-coral" data-beat="c9_2" tabindex="0"><rect x="190" y="238" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="259" text-anchor="middle" dominant-baseline="central">Mini Boss — Corrupted Naga Warrior</text><text class="ts" x="340" y="278" text-anchor="middle" dominant-baseline="central">Grief without control — that's what it looks like</text></g>
+<line x1="340" y1="294" x2="340" y2="318" stroke="#993C1D" stroke-width="1.5" marker-end="url(#ar)"/>
+<g class="c-coral"><rect x="180" y="318" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="340" text-anchor="middle" dominant-baseline="central">Road to Elgrandsburgh</text></g></svg>`
+  },
+  { id:'c10', phase:'p2', num:'Chapter 10', title:'Corrupted Elgrandsburgh & Kana',
+    sub:'The motif begins before Dokuri enters the square. One last night. She fades at dawn.',
+    tags:['open'],
+    beats:['c10_0','c10_1','c10_2','c10_3'],
+    svg:`<svg width="100%" viewBox="0 0 680 700" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#993C1D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-red"><rect x="180" y="20" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="42" text-anchor="middle" dominant-baseline="central">Corrupted Elgrandsburgh</text></g>
+<g class="node c-green" data-beat="c10_0" tabindex="0"><rect x="190" y="78" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="99" text-anchor="middle" dominant-baseline="central">Arrival &amp; City Exploration</text><text class="ts" x="340" y="118" text-anchor="middle" dominant-baseline="central">City open — no shops — revisit locations</text></g>
+<line x1="340" y1="134" x2="340" y2="158" stroke="#993C1D" stroke-width="1.5" marker-end="url(#ar)"/>
+<g class="node c-coral" data-beat="c10_1" tabindex="0"><rect x="190" y="158" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="179" text-anchor="middle" dominant-baseline="central">Mini Boss — Corrupted Royal Guard</text><text class="ts" x="340" y="198" text-anchor="middle" dominant-baseline="central">Last cult soldier — recognition makes it sad</text></g>
+<line x1="340" y1="214" x2="340" y2="238" stroke="#993C1D" stroke-width="1.5" marker-end="url(#ar)"/>
+<g class="node c-pink" data-beat="c10_2" tabindex="0"><rect x="170" y="238" width="340" height="56" rx="8" stroke-width="1"/><text class="th" x="340" y="259" text-anchor="middle" dominant-baseline="central">Kana Motif &amp; The Fight</text><text class="ts" x="340" y="278" text-anchor="middle" dominant-baseline="central">Inverted melody — spirit cat purifies her</text></g>
+<line x1="340" y1="294" x2="340" y2="318" stroke="#993C1D" stroke-width="1.5" marker-end="url(#ar)"/>
+<g class="node c-green" data-beat="c10_3" tabindex="0"><rect x="190" y="318" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="340" y="339" text-anchor="middle" dominant-baseline="central">One Last Night — Free Time</text><text class="ts" x="340" y="358" text-anchor="middle" dominant-baseline="central">No timer, no objectives — she fades at dawn</text></g>
+<line x1="340" y1="374" x2="340" y2="398" stroke="#993C1D" stroke-width="1.5" marker-end="url(#ar)"/>
+<g class="c-coral"><rect x="180" y="398" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="420" text-anchor="middle" dominant-baseline="central">Road back to the temple</text></g></svg>`
+  },
+  { id:'c11', phase:'p2', num:'Chapter 11', title:'The Final Confrontation & Ending',
+    sub:'The partial form. Charybdis. The Fae betrayal and choice. The merge. Day one.',
+    tags:['boss','turn'],
+    beats:['c11_0','c11_1','c11_2'],
+    svg:`<svg width="100%" viewBox="0 0 680 540" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-red"><rect x="180" y="20" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="42" text-anchor="middle" dominant-baseline="central">The Final Confrontation</text></g>
+<g class="node c-red" data-beat="c11_0" tabindex="0"><rect x="170" y="78" width="340" height="56" rx="8" stroke-width="1"/><text class="th" x="340" y="99" text-anchor="middle" dominant-baseline="central">Beat 01 — Partial Form Boss</text><text class="ts" x="340" y="118" text-anchor="middle" dominant-baseline="central">All four fighting styles — spirit cat weakens it</text></g>
+<line x1="340" y1="134" x2="340" y2="158" class="arr" marker-end="url(#ar)"/>
+<g class="node c-red" data-beat="c11_1" tabindex="0"><rect x="170" y="158" width="340" height="56" rx="8" stroke-width="1"/><text class="th" x="340" y="179" text-anchor="middle" dominant-baseline="central">Beat 02 — Charybdis, Betrayal &amp; Choice</text><text class="ts" x="340" y="198" text-anchor="middle" dominant-baseline="central">The Fae was built for this — chooses something else</text></g>
+<line x1="340" y1="214" x2="340" y2="238" class="arr" marker-end="url(#ar)"/>
+<g class="node c-teal" data-beat="c11_2" tabindex="0"><rect x="170" y="238" width="340" height="56" rx="8" stroke-width="1"/><text class="th" x="340" y="259" text-anchor="middle" dominant-baseline="central">Beat 03 — The Merge &amp; The Ending</text><text class="ts" x="340" y="278" text-anchor="middle" dominant-baseline="central">Steel spent — Stone magic gained — Day one</text></g>
+<line x1="340" y1="294" x2="340" y2="318" class="arr" marker-end="url(#ar)"/>
+<g class="c-teal"><rect x="180" y="318" width="320" height="34" rx="8" stroke-width="0.5"/><text class="th" x="340" y="340" text-anchor="middle" dominant-baseline="central">The world is diminished and free</text></g></svg>`
+  }
+];
+
+// ── RENDER CHAPTER SELECT ──
+const grids = { p1: document.getElementById('grid-p1'), turn: document.getElementById('grid-turn'), p2: document.getElementById('grid-p2') };
+const tagLabels = { boss:'Boss', open:'Open World', shop:'Shops', magic:'Magic Unlock', turn:'Linear' };
+const tagClass = { boss:'tag-boss', open:'tag-open', shop:'tag-shop', magic:'tag-magic', turn:'tag-turn' };
+
+CHAPTERS.forEach(ch => {
+  const card = document.createElement('div');
+  card.className = 'chapter-card';
+  const tagsHtml = ch.tags.map(t => `<span class="tag ${tagClass[t]}">${tagLabels[t]}</span>`).join('');
+  card.innerHTML = `<div class="ch-num">${ch.num}</div><div class="ch-title">${ch.title}</div><div class="ch-sub">${ch.sub}</div><div class="ch-tags">${tagsHtml}</div>`;
+  card.addEventListener('click', () => showChapter(ch));
+  grids[ch.phase].appendChild(card);
+});
+
+// ── VIEWS ──
+function showChapter(ch) {
+  document.getElementById('home-view').classList.add('hidden');
+  document.getElementById('system-view').classList.remove('visible');
+  const cv = document.getElementById('chapter-view');
+  cv.classList.add('visible');
+  document.getElementById('cv-title').textContent = ch.num + ' — ' + ch.title;
+  document.getElementById('cv-desc').textContent = ch.sub;
+  document.getElementById('cv-svg').innerHTML = ch.svg;
+  document.getElementById('navBack').classList.add('visible');
+  document.getElementById('tabStory').classList.add('active');
+  document.getElementById('tabSystems').classList.remove('active');
+  attachBeatHandlers();
+  window.scrollTo(0,0);
+}
+
+function showHome() {
+  document.getElementById('home-view').classList.remove('hidden');
+  document.getElementById('chapter-view').classList.remove('visible');
+  document.getElementById('system-view').classList.remove('visible');
+  document.getElementById('navBack').classList.remove('visible');
+  window.scrollTo(0,0);
+}
+
+function switchTab(tab) {
+  document.getElementById('tabStory').classList.toggle('active', tab==='story');
+  document.getElementById('tabSystems').classList.toggle('active', tab==='systems');
+  if(tab==='story') {
+    document.getElementById('home-view').classList.remove('hidden');
+    document.getElementById('chapter-view').classList.remove('visible');
+    document.getElementById('system-view').classList.remove('visible');
+    document.getElementById('navBack').classList.remove('visible');
+  } else {
+    document.getElementById('home-view').classList.add('hidden');
+    document.getElementById('chapter-view').classList.remove('visible');
+    document.getElementById('system-view').classList.add('visible');
+    document.getElementById('navBack').classList.remove('visible');
+  }
+  window.scrollTo(0,0);
+}
+
+// ── BEAT HANDLERS ──
+function attachBeatHandlers() {
+  document.querySelectorAll('[data-beat]').forEach(el => {
+    el.addEventListener('click', () => openBeat(el.getAttribute('data-beat')));
+    el.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' ') openBeat(el.getAttribute('data-beat')); });
+  });
+}
+
+const lc = { what:'lbl-what', opt:'lbl-opt', int:'lbl-int', mus:'lbl-mus', open:'lbl-open', shop:'lbl-shop', magic:'lbl-magic', arch:'lbl-what' };
+const lt = { what:'Scene', opt:'Optional', int:'Internal', mus:'Kana', open:'Open World', shop:'Shops', magic:'Magic Unlock', arch:'The Architect' };
+
+function openBeat(key) {
+  const d = BEATS[key]; if(!d) return;
+  let h = `<p class="modal-tag">${d.tag}</p><h2 class="modal-title">${d.title}</h2>`;
+  d.secs.forEach(s => {
+    h += `<div class="sec"><p class="sec-label ${lc[s.t]||''}">${lt[s.t]||s.t} — ${s.l}</p><div class="sec-body">${s.h}</div></div>`;
+  });
+  document.getElementById('mc').innerHTML = h;
+  document.getElementById('modal').scrollTop = 0;
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('closeBtn').focus();
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('closeBtn').addEventListener('click', closeModal);
+document.getElementById('overlay').addEventListener('click', e => { if(e.target===document.getElementById('overlay')) closeModal(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+</script>
+</body>
+</html>

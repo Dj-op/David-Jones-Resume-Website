@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>briar.mp3</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0d0a;
+    font-family: 'Share Tech Mono', monospace;
+    color: #7a9e7a;
+    padding: 40px 20px;
+    min-height: 100vh;
+  }
+
+  h1 {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #2a4a2a;
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .players {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .player {
+    padding: 20px;
+    border: 1px solid #1a2a1a;
+    background: #0e120e;
+  }
+
+  .slide-label {
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #2a4a2a;
+    margin-bottom: 4px;
+  }
+
+  .track-name {
+    font-size: 13px;
+    color: #9aba9a;
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  .slide-name {
+    font-size: 10px;
+    color: #3a5a3a;
+    margin-bottom: 14px;
+    letter-spacing: 0.1em;
+  }
+
+  audio {
+    width: 100%;
+    filter: invert(1) hue-rotate(90deg) brightness(0.55);
+  }
+
+  .warning {
+    margin-top: 12px;
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    color: #1a3a1a;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dot {
+    width: 5px;
+    height: 5px;
+    background: #3a6a3a;
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: pulse 2.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.8; }
+  }
+</style>
+</head>
+<body>
+
+<h1>don't fall asleep — audio index</h1>
+
+<div class="players">
+
+  <div class="player">
+    <div class="slide-label">title slide</div>
+    <div class="track-name">Elektra — Whispering Pines</div>
+    <div class="slide-name">Don't Fall Asleep</div>
+    <audio controls>
+      <source src="https://copyrightfreelofi.com/wp-content/uploads/2024/11/Elektra-Whispering-Pines.mp3" type="audio/mpeg">
+    </audio>
+    <div class="warning"><span class="dot"></span>briar.mp3 — do not fall asleep</div>
+  </div>
+
+  <div class="player">
+    <div class="slide-label">slide 1</div>
+    <div class="track-name">Elektra — Uneven</div>
+    <div class="slide-name">The List</div>
+    <audio controls>
+      <source src="https://copyrightfreelofi.com/wp-content/uploads/2024/12/Elektra-Uneven.mp3" type="audio/mpeg">
+    </audio>
+    <div class="warning"><span class="dot"></span>briar.mp3 — do not fall asleep</div>
+  </div>
+
+  <div class="player">
+    <div class="slide-label">slide 2</div>
+    <div class="track-name">Elektra — Spirit of The Winds</div>
+    <div class="slide-name">The Spinner</div>
+    <audio controls>
+      <source src="https://copyrightfreelofi.com/wp-content/uploads/2024/12/Elektra-Spirit-of-The-Winds.mp3" type="audio/mpeg">
+    </audio>
+    <div class="warning"><span class="dot"></span>briar.mp3 — do not fall asleep</div>
+  </div>
+
+  <div class="player">
+    <div class="slide-label">slide 3</div>
+    <div class="track-name">Nilix — Forgotten Skies</div>
+    <div class="slide-name">Dr. Celia Brandt</div>
+    <audio controls>
+      <source src="https://copyrightfreelofi.com/wp-content/uploads/2024/11/LANDR-Nilix-Forgotten-Skies-Warm-Low.mp3" type="audio/mpeg">
+    </audio>
+    <div class="warning"><span class="dot"></span>briar.mp3 — do not fall asleep</div>
+  </div>
+
+  <div class="player">
+    <div class="slide-label">slide 4</div>
+    <div class="track-name">Nilix — Midnight Serenade</div>
+    <div class="slide-name">The Phone Number</div>
+    <audio controls>
+      <source src="https://copyrightfreelofi.com/wp-content/uploads/2024/11/LANDR-Nilix-Midnight-Serenade-Warm-Low.mp3" type="audio/mpeg">
+    </audio>
+    <div class="warning"><span class="dot"></span>briar.mp3 — do not fall asleep</div>
+  </div>
+
+  <div class="player">
+    <div class="slide-label">slide 5</div>
+    <div class="track-name">Nilix — The Pain of Two</div>
+    <div class="slide-name">The Verrett House</div>
+    <audio controls>
+      <source src="https://copyrightfreelofi.com/wp-content/uploads/2024/11/LANDR-Nilix-The-Pain-of-Two-Warm-Low.mp3" type="audio/mpeg">
+    </audio>
+    <div class="warning"><span class="dot"></span>briar.mp3 — do not fall asleep</div>
+  </div>
+
+  <div class="player">
+    <div class="slide-label">slide 6</div>
+    <div class="track-name">Elektra — Running in the Night</div>
+    <div class="slide-name">The Wiki</div>
+    <audio controls>
+      <source src="https://copyrightfreelofi.com/wp-content/uploads/2024/12/Elektra-Running-In-the-Night.mp3" type="audio/mpeg">
+    </audio>
+    <div class="warning"><span class="dot"></span>briar.mp3 — do not fall asleep</div>
+  </div>
+
+  <div class="player">
+    <div class="slide-label">slide 7</div>
+    <div class="track-name">Nilix — Into The Wind</div>
+    <div class="slide-name">The Loophole</div>
+    <audio controls>
+      <source src="https://copyrightfreelofi.com/wp-content/uploads/2024/11/LANDR-Nilix-Into-The-Wind-Warm-Low.mp3" type="audio/mpeg">
+    </audio>
+    <div class="warning"><span class="dot"></span>briar.mp3 — do not fall asleep</div>
+  </div>
+
+</div>
+
+</body>
+</html>

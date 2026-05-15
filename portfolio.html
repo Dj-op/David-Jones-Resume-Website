@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Share+Tech+Mono&family=Cinzel:wght@400;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:     #0c0c0c;
+    --paper:   #f0ebe3;
+    --accent:  #c94a1a;
+    --muted:   #9a8f84;
+    --border:  #d8d0c6;
+    --card-bg: #e8e2d9;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    min-height: 100vh;
+    cursor: crosshair;
+  }
+
+  /* grain overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* ── HEADER ── */
+  header {
+    border-bottom: 2px solid var(--ink);
+    padding: 48px 60px 36px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 20px;
+  }
+
+  .name {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(48px, 8vw, 100px);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  .name em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .header-meta {
+    text-align: right;
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    line-height: 2;
+  }
+
+  .header-meta a {
+    color: var(--accent);
+    text-decoration: none;
+    display: block;
+  }
+
+  .header-meta a:hover { text-decoration: underline; }
+
+  /* ── MARQUEE STRIP ── */
+  .strip {
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    padding: 8px 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .strip-inner {
+    display: inline-block;
+    animation: scroll 28s linear infinite;
+  }
+
+  .strip-inner span { margin: 0 32px; }
+  .strip-inner .dot { color: var(--accent); }
+
+  @keyframes scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* ── MAIN LAYOUT ── */
+  main {
+    padding: 0 60px 80px;
+  }
+
+  /* ── INTRO ── */
+  .intro {
+    padding: 56px 0 48px;
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: end;
+  }
+
+  .intro-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(18px, 2.5vw, 26px);
+    line-height: 1.4;
+    font-style: italic;
+    color: var(--ink);
+  }
+
+  .intro-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  .tag {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+  }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-size: 9px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 40px 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── PROJECT CARDS ── */
+  .projects {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .project {
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 32px;
+    padding: 32px 0;
+    align-items: start;
+    transition: background 0.2s;
+    cursor: default;
+  }
+
+  .project:last-child { border-bottom: 1px solid var(--border); }
+
+  .project:hover { background: var(--card-bg); margin: 0 -20px; padding-left: 20px; padding-right: 20px; }
+
+  .project-num {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    padding-top: 6px;
+  }
+
+  .project-body { }
+
+  .project-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(22px, 3vw, 36px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin-bottom: 10px;
+    color: var(--ink);
+  }
+
+  .project-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .project-desc {
+    color: #4a4540;
+    font-size: 12px;
+    line-height: 1.7;
+    max-width: 560px;
+    margin-bottom: 16px;
+  }
+
+  .project-stack {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .stack-item {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .stack-item::before { content: '— '; }
+
+  .project-link {
+    display: inline-block;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--paper);
+    background: var(--ink);
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: background 0.15s;
+    white-space: nowrap;
+    align-self: start;
+    margin-top: 6px;
+  }
+
+  .project-link:hover { background: var(--accent); }
+
+  /* ── ACCENT BLOCK ── */
+  .accent-block {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 48px 52px;
+    margin: 60px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+
+  .accent-block-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(20px, 2.5vw, 28px);
+    font-style: italic;
+    line-height: 1.4;
+  }
+
+  .accent-block-text em { color: var(--accent); font-style: normal; }
+
+  .accent-block-detail {
+    font-size: 11px;
+    color: #9a9490;
+    line-height: 1.9;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 2px solid var(--ink);
+    padding: 28px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 700px) {
+    header, main, footer { padding-left: 24px; padding-right: 24px; }
+    header { grid-template-columns: 1fr; }
+    .header-meta { text-align: left; }
+    .intro { grid-template-columns: 1fr; gap: 32px; }
+    .intro-tags { justify-content: flex-start; }
+    .project { grid-template-columns: 40px 1fr; }
+    .project-link { display: none; }
+    .accent-block { grid-template-columns: 1fr; padding: 32px 28px; }
+    footer { flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div>
+    <div class="name">work &amp;<br><em>projects</em></div>
+  </div>
+  <div class="header-meta">
+    SUNY Canton<br>
+    web / design / writing<br>
+    <a href="https://www.instagram.com/sunycantongram/reels/" target="_blank">@sunycantongram</a>
+  </div>
+</header>
+
+<!-- MARQUEE -->
+<div class="strip">
+  <div class="strip-inner">
+    <span>HTML</span><span class="dot">✦</span>
+    <span>CSS</span><span class="dot">✦</span>
+    <span>JavaScript</span><span class="dot">✦</span>
+    <span>Web Design</span><span class="dot">✦</span>
+    <span>Game Design</span><span class="dot">✦</span>
+    <span>Creative Writing</span><span class="dot">✦</span>
+    <span>Digital Media</span><span class="dot">✦</span>
+    <span>HTML</span><span class="dot">✦</span>
+    <span>CSS</span><span class="dot">✦</span>
+    <span>JavaScript</span><span class="dot">✦</span>
+    <span>Web Design</span><span class="dot">✦</span>
+    <span>Game Design</span><span class="dot">✦</span>
+    <span>Creative Writing</span><span class="dot">✦</span>
+    <span>Digital Media</span><span class="dot">✦</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main>
+
+  <div class="intro">
+    <div class="intro-text">
+      A collection of web projects — dark, atmospheric, built by hand.
+    </div>
+    <div class="intro-tags">
+      <span class="tag">Custom CSS</span>
+      <span class="tag">No Frameworks</span>
+      <span class="tag">Original Design</span>
+      <span class="tag">2024 – 2025</span>
+    </div>
+  </div>
+
+  <div class="section-label">selected projects</div>
+
+  <div class="projects">
+
+    <!-- PROJECT 1 -->
+    <div class="project">
+      <div class="project-num">01</div>
+      <div class="project-body">
+        <div class="project-title"><em>briar</em>.mp3</div>
+        <div class="project-desc">
+          An audio index built for a presentation called "Don't Fall Asleep." Each slide gets its own lo-fi track — the page pairs ambient music with chapter titles using a dark terminal aesthetic and custom-filtered audio controls.
+        </div>
+        <div class="project-stack">
+          <span class="stack-item">HTML / CSS</span>
+          <span class="stack-item">Web Audio</span>
+          <span class="stack-item">Share Tech Mono</span>
+          <span class="stack-item">Lo-fi / Ambient</span>
+        </div>
+      </div>
+      <a class="project-link" href="index.html">open →</a>
+    </div>
+
+    <!-- PROJECT 2 -->
+    <div class="project">
+      <div class="project-num">02</div>
+      <div class="project-body">
+        <div class="project-title">TYPIS: <em>Prologue</em></div>
+        <div class="project-desc">
+          A full design document for an original game — built as a living webpage. Deep ocean color palette, animated floating particles, a rotating water wheel, Cinzel display type, and scroll-driven sections lay out the world, mechanics, and lore of the prologue.
+        </div>
+        <div class="project-stack">
+          <span class="stack-item">HTML / CSS / JS</span>
+          <span class="stack-item">CSS Animation</span>
+          <span class="stack-item">Cinzel + Crimson Pro</span>
+          <span class="stack-item">Game Design</span>
+        </div>
+      </div>
+      <a class="project-link" href="typis.html">open →</a>
+    </div>
+
+    <!-- PROJECT 3 -->
+    <div class="project">
+      <div class="project-num">03</div>
+      <div class="project-body">
+        <div class="project-title">Moby Dick — <em>Whaleboat</em></div>
+        <div class="project-desc">
+          A final project exploring the whaleboat and osteological plates in Melville's Moby Dick. Research and visual design combined into a single page — a web-based academic presentation with a nautical theme.
+        </div>
+        <div class="project-stack">
+          <span class="stack-item">HTML / CSS</span>
+          <span class="stack-item">Research / Writing</span>
+          <span class="stack-item">Nautical Theme</span>
+          <span class="stack-item">Academic</span>
+        </div>
+      </div>
+      <a class="project-link" href="Moby_Dick_Final_Project.html">open →</a>
+    </div>
+
+  </div>
+
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <span>portfolio — 2025</span>
+  <span>html / css / js — hand built</span>
+  <a href="https://www.instagram.com/sunycantongram/reels/" target="_blank">instagram ↗</a>
+</footer>
+
+</body>
+</html>

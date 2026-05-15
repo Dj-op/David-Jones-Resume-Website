@@ -1,0 +1,1869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TYPIS: Prologue Design Document</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   THEME VARIABLES — change colors/fonts here globally
+   ============================================================ */
+:root {
+  --bg-deep:       #030d10;
+  --bg-mid:        #071820;
+  --bg-surface:    #0d2530;
+  --bg-card:       #0a1e28;
+
+  --accent-primary:  #00e5c3;
+  --accent-secondary:#2df0a0;
+  --accent-dim:      #0a6b5a;
+  --accent-rust:     #8b4c2a;
+  --accent-rust-dim: #3d1f0f;
+
+  --text-primary:  #c8e8e0;
+  --text-secondary:#7ab8aa;
+  --text-muted:    #3d6b5e;
+  --text-dim:      #1a3d35;
+
+  --glow-teal:     0 0 20px rgba(0, 229, 195, 0.35);
+  --glow-strong:   0 0 40px rgba(0, 229, 195, 0.6);
+  --glow-rust:     0 0 20px rgba(139, 76, 42, 0.4);
+
+  --border:        1px solid rgba(0, 229, 195, 0.15);
+  --border-bright: 1px solid rgba(0, 229, 195, 0.5);
+
+  --font-display:  'Cinzel', serif;
+  --font-body:     'Crimson Pro', Georgia, serif;
+
+  --wheel-speed:   12s;   /* water wheel rotation speed */
+  --bubble-count:  18;
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.7;
+  overflow-x: hidden;
+  cursor: crosshair;
+}
+
+/* ============================================================
+   ANIMATED BACKGROUND — water ripple + grain
+   ============================================================ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 120% 60% at 20% 80%, rgba(0,80,60,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 40% at 80% 20%, rgba(0,40,80,0.25) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 50% 50%, rgba(0,20,30,0.4) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  animation: breathe 8s ease-in-out infinite alternate;
+}
+
+@keyframes breathe {
+  0%   { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 3px; }
+
+/* ============================================================
+   LAYOUT UTILITIES
+   ============================================================ */
+.site-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.section {
+  padding: 5rem 0;
+  border-top: var(--border);
+  position: relative;
+}
+
+.section-label {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 0.4em;
+  color: var(--accent-dim);
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--accent-dim), transparent);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 900;
+  color: var(--text-primary);
+  letter-spacing: 0.05em;
+  line-height: 1.1;
+  margin-bottom: 2.5rem;
+}
+
+.section-title span {
+  color: var(--accent-primary);
+  text-shadow: var(--glow-teal);
+}
+
+/* ============================================================
+   BUBBLES — floating ambient particles
+   ============================================================ */
+.bubbles-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.bubble {
+  position: absolute;
+  bottom: -20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(0, 229, 195, 0.3), rgba(0, 229, 195, 0.05));
+  border: 1px solid rgba(0, 229, 195, 0.2);
+  animation: floatUp linear infinite;
+}
+
+/* generate 12 bubbles with CSS */
+.bubble:nth-child(1)  { width:6px;  height:6px;  left:5%;   animation-duration:14s; animation-delay:0s;   }
+.bubble:nth-child(2)  { width:10px; height:10px; left:12%;  animation-duration:18s; animation-delay:2s;   }
+.bubble:nth-child(3)  { width:4px;  height:4px;  left:22%;  animation-duration:12s; animation-delay:5s;   }
+.bubble:nth-child(4)  { width:8px;  height:8px;  left:33%;  animation-duration:20s; animation-delay:1s;   }
+.bubble:nth-child(5)  { width:5px;  height:5px;  left:45%;  animation-duration:16s; animation-delay:7s;   }
+.bubble:nth-child(6)  { width:12px; height:12px; left:55%;  animation-duration:22s; animation-delay:3s;   }
+.bubble:nth-child(7)  { width:7px;  height:7px;  left:65%;  animation-duration:15s; animation-delay:9s;   }
+.bubble:nth-child(8)  { width:4px;  height:4px;  left:72%;  animation-duration:13s; animation-delay:4s;   }
+.bubble:nth-child(9)  { width:9px;  height:9px;  left:80%;  animation-duration:19s; animation-delay:6s;   }
+.bubble:nth-child(10) { width:6px;  height:6px;  left:88%;  animation-duration:17s; animation-delay:11s;  }
+.bubble:nth-child(11) { width:3px;  height:3px;  left:92%;  animation-duration:11s; animation-delay:8s;   }
+.bubble:nth-child(12) { width:8px;  height:8px;  left:38%;  animation-duration:21s; animation-delay:14s;  }
+
+@keyframes floatUp {
+  0%   { transform: translateY(0) translateX(0)   scale(1);   opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 0.6; }
+  100% { transform: translateY(-110vh) translateX(30px) scale(0.6); opacity: 0; }
+}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(3, 13, 16, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: var(--border);
+  padding: 0.9rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 900;
+  letter-spacing: 0.3em;
+  color: var(--accent-primary);
+  text-shadow: var(--glow-teal);
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+}
+
+.nav-links a {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.2s, text-shadow 0.2s;
+  position: relative;
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--accent-primary);
+  box-shadow: var(--glow-teal);
+  transition: width 0.3s;
+}
+
+.nav-links a:hover { color: var(--accent-primary); text-shadow: var(--glow-teal); }
+.nav-links a:hover::after { width: 100%; }
+
+/* ============================================================
+   MODULE: HERO
+   ============================================================ */
+#hero {
+  min-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  padding: 5rem 0 3rem;
+  overflow: hidden;
+}
+
+/* animated water surface at bottom of hero */
+#hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -10%;
+  width: 120%;
+  height: 60px;
+  background: var(--bg-mid);
+  clip-path: polygon(
+    0% 80%, 2% 60%, 4% 75%, 6% 55%, 8% 70%, 10% 50%,
+    12% 65%, 14% 45%, 16% 60%, 18% 40%, 20% 58%, 22% 38%,
+    24% 55%, 26% 70%, 28% 50%, 30% 65%, 32% 45%, 34% 60%,
+    36% 42%, 38% 58%, 40% 75%, 42% 55%, 44% 70%, 46% 50%,
+    48% 65%, 50% 45%, 52% 62%, 54% 78%, 56% 58%, 58% 72%,
+    60% 52%, 62% 68%, 64% 48%, 66% 63%, 68% 43%, 70% 60%,
+    72% 75%, 74% 55%, 76% 70%, 78% 50%, 80% 65%, 82% 45%,
+    84% 62%, 86% 78%, 88% 58%, 90% 73%, 92% 53%, 94% 68%,
+    96% 48%, 98% 63%, 100% 80%, 100% 100%, 0% 100%
+  );
+  animation: waterSurface 6s ease-in-out infinite alternate;
+  z-index: 2;
+}
+
+@keyframes waterSurface {
+  0% { clip-path: polygon(0% 80%, 2% 60%, 4% 75%, 6% 55%, 8% 70%, 10% 50%, 12% 65%, 14% 45%, 16% 60%, 18% 40%, 20% 58%, 22% 38%, 24% 55%, 26% 70%, 28% 50%, 30% 65%, 32% 45%, 34% 60%, 36% 42%, 38% 58%, 40% 75%, 42% 55%, 44% 70%, 46% 50%, 48% 65%, 50% 45%, 52% 62%, 54% 78%, 56% 58%, 58% 72%, 60% 52%, 62% 68%, 64% 48%, 66% 63%, 68% 43%, 70% 60%, 72% 75%, 74% 55%, 76% 70%, 78% 50%, 80% 65%, 82% 45%, 84% 62%, 86% 78%, 88% 58%, 90% 73%, 92% 53%, 94% 68%, 96% 48%, 98% 63%, 100% 80%, 100% 100%, 0% 100%); }
+  100% { clip-path: polygon(0% 55%, 2% 75%, 4% 55%, 6% 72%, 8% 52%, 10% 68%, 12% 48%, 14% 64%, 16% 44%, 18% 62%, 20% 78%, 22% 58%, 24% 73%, 26% 53%, 28% 68%, 30% 48%, 32% 65%, 34% 80%, 36% 60%, 38% 75%, 40% 55%, 42% 72%, 44% 52%, 46% 68%, 48% 48%, 50% 65%, 52% 80%, 54% 60%, 56% 75%, 58% 55%, 60% 72%, 62% 52%, 64% 68%, 66% 48%, 68% 65%, 70% 45%, 72% 62%, 74% 78%, 76% 58%, 78% 73%, 80% 53%, 82% 68%, 84% 48%, 86% 65%, 88% 45%, 90% 62%, 92% 78%, 94% 58%, 96% 73%, 98% 53%, 100% 55%, 100% 100%, 0% 100%); }
+}
+
+/* decorative water wheels in hero background */
+.wheel-container {
+  position: absolute;
+  right: -60px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.wheel-container-left {
+  position: absolute;
+  left: -80px;
+  bottom: 80px;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.water-wheel {
+  animation: spinWheel var(--wheel-speed) linear infinite;
+  transform-origin: center;
+}
+
+.water-wheel-slow {
+  animation: spinWheel calc(var(--wheel-speed) * 2) linear infinite reverse;
+  transform-origin: center;
+}
+
+@keyframes spinWheel {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.hero-eyebrow {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 0.5em;
+  color: var(--accent-primary);
+  text-shadow: var(--glow-teal);
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  animation: fadeSlideIn 1s ease both;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(4rem, 12vw, 9rem);
+  line-height: 0.95;
+  letter-spacing: 0.08em;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  animation: fadeSlideIn 1s 0.1s ease both;
+  position: relative;
+}
+
+.hero-title .glow-char {
+  color: var(--accent-primary);
+  text-shadow: var(--glow-strong);
+}
+
+.hero-subtitle {
+  font-family: var(--font-display);
+  font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+  letter-spacing: 0.3em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-bottom: 3rem;
+  animation: fadeSlideIn 1s 0.2s ease both;
+}
+
+.hero-description {
+  max-width: 540px;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  font-style: italic;
+  line-height: 1.8;
+  border-left: 2px solid var(--accent-dim);
+  padding-left: 1.5rem;
+  animation: fadeSlideIn 1s 0.3s ease both;
+}
+
+.hero-meta {
+  display: flex;
+  gap: 3rem;
+  margin-top: 3rem;
+  animation: fadeSlideIn 1s 0.4s ease both;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.meta-label {
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  letter-spacing: 0.3em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.meta-value {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   DECORATIVE DIVIDERS
+   ============================================================ */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  opacity: 0.4;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--accent-dim), transparent);
+}
+
+.divider-glyph {
+  color: var(--accent-dim);
+  font-size: 0.8rem;
+}
+
+/* ============================================================
+   MODULE: WORLD OVERVIEW
+   ============================================================ */
+#world .world-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.world-card {
+  background: var(--bg-card);
+  border: var(--border);
+  padding: 2rem;
+  position: relative;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.world-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 0;
+  background: var(--accent-primary);
+  box-shadow: var(--glow-teal);
+  transition: height 0.4s ease;
+}
+
+.world-card:hover { border-color: rgba(0,229,195,0.4); box-shadow: var(--glow-teal); }
+.world-card:hover::before { height: 100%; }
+
+.world-card-title {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+  margin-bottom: 0.75rem;
+}
+
+.world-card p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+
+/* wide card */
+.world-card.wide { grid-column: span 2; }
+
+/* IMAGE PLACEHOLDER */
+.img-placeholder {
+  background: var(--bg-surface);
+  border: 1px dashed rgba(0,229,195,0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s;
+  cursor: pointer;
+  padding: 1rem;
+}
+
+.img-placeholder:hover { border-color: rgba(0,229,195,0.6); }
+
+.img-placeholder::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 40%, rgba(0,229,195,0.03) 100%);
+}
+
+.img-placeholder svg {
+  opacity: 0.4;
+}
+
+.img-placeholder .img-label {
+  color: var(--accent-dim);
+}
+
+/* actual images (when added) inherit the same container size */
+.img-placeholder img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none; /* show when src is set via JS */
+}
+
+.img-placeholder.has-image img { display: block; }
+.img-placeholder.has-image svg, .img-placeholder.has-image .img-label { display: none; }
+
+/* ============================================================
+   MODULE: CHARACTER
+   ============================================================ */
+#characters .char-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+.char-portrait {
+  height: 380px;
+}
+
+.char-info {}
+
+.char-name {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.char-title-sub {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+}
+
+.char-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-item {
+  background: var(--bg-card);
+  border: var(--border);
+  padding: 1rem 1.25rem;
+}
+
+.stat-key {
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  letter-spacing: 0.25em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+
+.stat-val {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.char-bio {
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-bottom: 1.5rem;
+  line-height: 1.8;
+}
+
+/* ring cost tracker */
+.ring-tracker {
+  background: var(--bg-card);
+  border: var(--border);
+  padding: 1.25rem 1.5rem;
+  border-left: 3px solid var(--accent-rust);
+}
+
+.ring-tracker-label {
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  letter-spacing: 0.25em;
+  color: var(--accent-rust);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.ring-cost-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ============================================================
+   MODULE: SCRIPT / SCENES
+   ============================================================ */
+#script .scene-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.scene {
+  border: var(--border);
+  background: var(--bg-card);
+  position: relative;
+}
+
+.scene-header {
+  background: var(--bg-surface);
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: var(--border);
+}
+
+.scene-number {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  color: var(--accent-dim);
+  text-transform: uppercase;
+}
+
+.scene-name {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  letter-spacing: 0.06em;
+  color: var(--text-primary);
+}
+
+.scene-location {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.scene-body {
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.scene-image-slot {
+  height: 240px;
+}
+
+.scene-content {}
+
+.scene-beat {
+  margin-bottom: 1.25rem;
+}
+
+.beat-label {
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  color: var(--accent-dim);
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+}
+
+.beat-text {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.dialogue-block {
+  border-left: 2px solid var(--accent-dim);
+  padding-left: 1.25rem;
+  margin: 0.75rem 0;
+}
+
+.dialogue-speaker {
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  margin-bottom: 0.2rem;
+}
+
+.dialogue-line {
+  color: var(--text-secondary);
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+/* choice node */
+.choice-node {
+  background: var(--bg-surface);
+  border: var(--border);
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+  border-left: 3px solid var(--accent-primary);
+  box-shadow: var(--glow-teal);
+}
+
+.choice-label {
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  letter-spacing: 0.25em;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.choice-option {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin: 0.35rem 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.choice-bullet {
+  color: var(--accent-primary);
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   MODULE: FLOWCHART
+   ============================================================ */
+#flowchart .flow-svg-wrap {
+  width: 100%;
+  overflow-x: auto;
+  padding: 1rem 0 2rem;
+}
+
+.flow-node {
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+
+.flow-node:hover rect,
+.flow-node:hover ellipse {
+  filter: brightness(1.3);
+  stroke-width: 2;
+}
+
+.flow-node:hover text { fill: #fff; }
+
+.flow-tooltip {
+  position: fixed;
+  background: var(--bg-surface);
+  border: var(--border-bright);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  padding: 0.6rem 1rem;
+  pointer-events: none;
+  display: none;
+  z-index: 200;
+  max-width: 260px;
+  line-height: 1.5;
+  box-shadow: var(--glow-teal);
+}
+
+/* ============================================================
+   MODULE: STORYBOARD
+   ============================================================ */
+#storyboard .board-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.board-panel {
+  position: relative;
+  background: var(--bg-card);
+  border: var(--border);
+  overflow: hidden;
+}
+
+.board-num {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.7rem;
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  color: var(--accent-dim);
+  z-index: 2;
+}
+
+.panel-img-slot {
+  height: 200px;
+}
+
+.board-caption {
+  padding: 0.75rem 0.9rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+  border-top: var(--border);
+}
+
+.board-sequence-label {
+  display: flex;
+  align-items: baseline;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: var(--border);
+}
+
+.board-sequence-label span:first-child {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+  text-shadow: var(--glow-teal);
+}
+
+.board-sequence-sub {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.panel-text-body {
+  padding: 0.9rem 1rem;
+  border-top: var(--border);
+}
+
+.panel-shot {
+  font-family: var(--font-display);
+  font-size: 0.52rem;
+  letter-spacing: 0.2em;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+
+.panel-desc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  font-style: italic;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer {
+  position: relative;
+  border-top: var(--border);
+  padding: 3rem 2rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  z-index: 1;
+}
+
+footer span { color: var(--accent-dim); }
+
+/* ============================================================
+   PIPE DECORATION — purely decorative SVG lines
+   ============================================================ */
+.pipe-decoration {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 120px;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.07;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+  nav { flex-direction: column; gap: 0.75rem; }
+  .nav-links { gap: 1.5rem; }
+  #world .world-grid { grid-template-columns: 1fr; }
+  .world-card.wide { grid-column: span 1; }
+  #characters .char-layout { grid-template-columns: 1fr; }
+  .char-portrait { height: 260px; }
+  .scene-body { grid-template-columns: 1fr; }
+  #storyboard .board-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero-meta { flex-direction: column; gap: 1.5rem; }
+  .wheel-container { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- BUBBLES LAYER — ambient particles, edit count in CSS -->
+<div class="bubbles-layer" aria-hidden="true">
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+</div>
+
+<!-- TOOLTIP for flowchart -->
+<div class="flow-tooltip" id="flowTooltip"></div>
+
+<!-- ============================================================
+     NAV — edit links here to match your sections
+     ============================================================ -->
+<nav>
+  <a href="#hero" class="nav-logo">TYPIS</a>
+  <ul class="nav-links">
+    <li><a href="#world">World</a></li>
+    <li><a href="#characters">Character</a></li>
+    <li><a href="#script">Script</a></li>
+    <li><a href="#flowchart">Structure</a></li>
+    <li><a href="#storyboard">Storyboard</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<!-- ============================================================
+     MODULE: HERO
+     Edit: title, subtitle, description, meta items
+     ============================================================ -->
+<section id="hero">
+
+  <!-- WATER WHEEL — right side decorative -->
+  <div class="wheel-container" aria-hidden="true">
+    <svg width="320" height="320" viewBox="0 0 320 320">
+      <circle cx="160" cy="160" r="155" fill="none" stroke="rgba(0,229,195,0.5)" stroke-width="2"/>
+      <circle cx="160" cy="160" r="140" fill="none" stroke="rgba(0,229,195,0.2)" stroke-width="1"/>
+      <g class="water-wheel">
+        <!-- 8 spokes + paddles -->
+        <line x1="160" y1="160" x2="160" y2="20"  stroke="rgba(0,229,195,0.7)" stroke-width="3"/>
+        <line x1="160" y1="160" x2="160" y2="300" stroke="rgba(0,229,195,0.7)" stroke-width="3"/>
+        <line x1="160" y1="160" x2="20"  y1="160" x2="20"  y2="160" stroke="rgba(0,229,195,0.7)" stroke-width="3"/>
+        <line x1="20"  y1="160" x2="300" y2="160" stroke="rgba(0,229,195,0.7)" stroke-width="3"/>
+        <line x1="160" y1="160" x2="61"  y2="61"  stroke="rgba(0,229,195,0.5)" stroke-width="2"/>
+        <line x1="160" y1="160" x2="259" y2="259" stroke="rgba(0,229,195,0.5)" stroke-width="2"/>
+        <line x1="160" y1="160" x2="259" y2="61"  stroke="rgba(0,229,195,0.5)" stroke-width="2"/>
+        <line x1="160" y1="160" x2="61"  y2="259" stroke="rgba(0,229,195,0.5)" stroke-width="2"/>
+        <!-- paddles -->
+        <rect x="140" y="8"   width="40" height="22" rx="3" fill="rgba(0,229,195,0.25)" stroke="rgba(0,229,195,0.5)" stroke-width="1"/>
+        <rect x="140" y="290" width="40" height="22" rx="3" fill="rgba(0,229,195,0.25)" stroke="rgba(0,229,195,0.5)" stroke-width="1"/>
+        <rect x="8"   y="140" width="22" height="40" rx="3" fill="rgba(0,229,195,0.25)" stroke="rgba(0,229,195,0.5)" stroke-width="1"/>
+        <rect x="290" y="140" width="22" height="40" rx="3" fill="rgba(0,229,195,0.25)" stroke="rgba(0,229,195,0.5)" stroke-width="1"/>
+        <rect x="49"  y="49"  width="24" height="24" rx="3" fill="rgba(0,229,195,0.18)" stroke="rgba(0,229,195,0.4)" stroke-width="1" transform="rotate(45 61 61)"/>
+        <rect x="247" y="247" width="24" height="24" rx="3" fill="rgba(0,229,195,0.18)" stroke="rgba(0,229,195,0.4)" stroke-width="1" transform="rotate(45 259 259)"/>
+        <rect x="247" y="49"  width="24" height="24" rx="3" fill="rgba(0,229,195,0.18)" stroke="rgba(0,229,195,0.4)" stroke-width="1" transform="rotate(45 259 61)"/>
+        <rect x="49"  y="247" width="24" height="24" rx="3" fill="rgba(0,229,195,0.18)" stroke="rgba(0,229,195,0.4)" stroke-width="1" transform="rotate(45 61 259)"/>
+      </g>
+      <!-- hub -->
+      <circle cx="160" cy="160" r="18" fill="var(--bg-mid)" stroke="rgba(0,229,195,0.6)" stroke-width="2"/>
+      <circle cx="160" cy="160" r="8"  fill="rgba(0,229,195,0.3)"/>
+    </svg>
+  </div>
+
+  <!-- WATER WHEEL — left small -->
+  <div class="wheel-container-left" aria-hidden="true">
+    <svg width="180" height="180" viewBox="0 0 180 180">
+      <circle cx="90" cy="90" r="85" fill="none" stroke="rgba(0,229,195,0.4)" stroke-width="1.5"/>
+      <g class="water-wheel-slow">
+        <line x1="90" y1="90" x2="90" y2="8"   stroke="rgba(0,229,195,0.6)" stroke-width="2"/>
+        <line x1="90" y1="90" x2="90" y2="172"  stroke="rgba(0,229,195,0.6)" stroke-width="2"/>
+        <line x1="90" y1="90" x2="8"  y2="90"  stroke="rgba(0,229,195,0.6)" stroke-width="2"/>
+        <line x1="90" y1="90" x2="172" y2="90"  stroke="rgba(0,229,195,0.6)" stroke-width="2"/>
+        <line x1="90" y1="90" x2="31" y2="31"  stroke="rgba(0,229,195,0.4)" stroke-width="1.5"/>
+        <line x1="90" y1="90" x2="149" y2="149" stroke="rgba(0,229,195,0.4)" stroke-width="1.5"/>
+        <line x1="90" y1="90" x2="149" y2="31"  stroke="rgba(0,229,195,0.4)" stroke-width="1.5"/>
+        <line x1="90" y1="90" x2="31" y2="149" stroke="rgba(0,229,195,0.4)" stroke-width="1.5"/>
+        <rect x="76" y="4"   width="28" height="16" rx="2" fill="rgba(0,229,195,0.2)" stroke="rgba(0,229,195,0.4)" stroke-width="1"/>
+        <rect x="76" y="160" width="28" height="16" rx="2" fill="rgba(0,229,195,0.2)" stroke="rgba(0,229,195,0.4)" stroke-width="1"/>
+        <rect x="4"  y="76"  width="16" height="28" rx="2" fill="rgba(0,229,195,0.2)" stroke="rgba(0,229,195,0.4)" stroke-width="1"/>
+        <rect x="160" y="76" width="16" height="28" rx="2" fill="rgba(0,229,195,0.2)" stroke="rgba(0,229,195,0.4)" stroke-width="1"/>
+      </g>
+      <circle cx="90" cy="90" r="10" fill="var(--bg-mid)" stroke="rgba(0,229,195,0.5)" stroke-width="1.5"/>
+    </svg>
+  </div>
+
+  <div class="site-wrap">
+    <p class="hero-eyebrow">Game Design Document: Prologue</p>
+    <h1 class="hero-title">
+      <span class="glow-char">T</span>YPIS
+    </h1>
+    <p class="hero-subtitle">A Biopunk Action-Adventure · The Night The City Falls</p>
+
+    <!-- HERO IMAGE PLACEHOLDER — swap for a banner/concept art -->
+    <div class="img-placeholder" style="height:260px; margin-bottom:2.5rem; max-width:600px;"
+         onclick="setImage(this)" data-label="HERO BANNER / CONCEPT ART">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21 15 16 10 5 21"/>
+      </svg>
+      <span class="img-label">HERO BANNER / CONCEPT ART</span>
+      <span style="font-size:0.5rem; color:var(--text-dim);">click to set image path</span>
+      <img src="" alt="hero banner">
+    </div>
+
+    <p class="hero-description">
+      Typis is a port city built on ocean biology. The infrastructure is partially alive,
+      the power grid runs on a tidal organism, and the city is slowly dying. On the night
+      it falls, one operative learns the cost of every form she has ever taken.
+    </p>
+
+    <div class="hero-meta">
+      <!-- EDIT THESE META ITEMS freely -->
+      <div class="meta-item">
+        <span class="meta-label">Genre</span>
+        <span class="meta-value">Biopunk Action-Adventure</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Scope</span>
+        <span class="meta-value">Prologue · Linear</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Protagonist</span>
+        <span class="meta-value">Riven</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Setting</span>
+        <span class="meta-value">Port City · Night</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     MODULE: WORLD OVERVIEW
+     Edit: card titles and body text below
+     ============================================================ -->
+<section id="world" class="section">
+  <div class="site-wrap">
+    <p class="section-label">01 · World</p>
+    <h2 class="section-title">The City of <span>Typis</span></h2>
+
+    <!-- WORLD ART PLACEHOLDER — full-width establishing shot -->
+    <div class="img-placeholder" style="height:320px; margin-bottom:2rem;"
+         onclick="setImage(this)" data-label="CITY ESTABLISHING SHOT">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21 15 16 10 5 21"/>
+      </svg>
+      <span class="img-label">CITY ESTABLISHING SHOT</span>
+      <img src="" alt="Typis establishing shot">
+    </div>
+
+    <div class="world-grid">
+
+      <!-- WORLD CARD: edit title + text -->
+      <div class="world-card">
+        <p class="world-card-title">The Tidal Organism</p>
+        <p>The city's power grid runs on a living creature rooted in the harbor floor. The turbines don't generate electricity: they translate the organism's pulses into usable current. When it falters, the lights do too.</p>
+      </div>
+
+      <div class="world-card">
+        <p class="world-card-title">Infrastructure</p>
+        <p>Skywalks of steel lattice-work arch overhead. Canals thread through markets. Sea-creature-form pumps, bent from shining metal, push currents through the city's arteries. Everything is partially alive.</p>
+      </div>
+
+      <div class="world-card">
+        <p class="world-card-title">Bioluminescence</p>
+        <p>Sea lanterns line the streets, casting wave-like shadows. When the lanterns die, it isn't accident. It is a message. The few who notice are the ones who have been watching all along.</p>
+      </div>
+
+      <div class="world-card">
+        <p class="world-card-title">The Tidewardens</p>
+        <p>City masters who maintain hydropower flow. They honor the sea and fear it in equal measure. They do not pardon those who expose what lies beneath: the vanishing ships, the twisted creatures, the price of comfort.</p>
+      </div>
+
+      <div class="world-card wide">
+        <p class="world-card-title">The Night It Falls</p>
+        <p>The turbines have hesitated before, in moments of imbalance noticed only by those watching closely. Tonight the hesitation becomes a shutdown. For the first time in a century, Typis stands still. The city that was built on constant motion, constant current, constant life. It stops.</p>
+        <div class="divider"><div class="divider-line"></div><span class="divider-glyph">◇</span><div class="divider-line"></div></div>
+        <p style="color:var(--text-muted); font-style:italic; font-size:0.9rem;">The sea is no longer waiting.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     MODULE: CHARACTER — Riven
+     Edit: name, subtitle, stats, bio, ring cost text
+     ============================================================ -->
+<section id="characters" class="section">
+  <div class="site-wrap">
+    <p class="section-label">02 · Character</p>
+    <h2 class="section-title"><span>Riven</span></h2>
+
+    <div class="char-layout">
+
+      <!-- CHARACTER PORTRAIT PLACEHOLDER -->
+      <div class="img-placeholder char-portrait"
+           onclick="setImage(this)" data-label="CHARACTER PORTRAIT: RIVEN">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span class="img-label">CHARACTER PORTRAIT: RIVEN</span>
+        <img src="" alt="Riven portrait">
+      </div>
+
+      <div class="char-info">
+        <h3 class="char-name">RIVEN</h3>
+        <p class="char-title-sub">Operative · Form-Shifter · Last Assignment</p>
+
+        <div class="char-stats">
+          <!-- EDIT STATS: add/remove as needed -->
+          <div class="stat-item">
+            <p class="stat-key">Role</p>
+            <p class="stat-val">Operative / Bodyguard</p>
+          </div>
+          <div class="stat-item">
+            <p class="stat-key">Ability</p>
+            <p class="stat-val">Form-shifting via cursed ring</p>
+          </div>
+          <div class="stat-item">
+            <p class="stat-key">Status</p>
+            <p class="stat-val">Losing herself to the ring</p>
+          </div>
+          <div class="stat-item">
+            <p class="stat-key">Alignment</p>
+            <p class="stat-val">Weaponized. Unwillingly.</p>
+          </div>
+        </div>
+
+        <p class="char-bio">
+          She twirls a grey ring around her finger, its surface engraved with worn runic letters
+          that glimmer weakly in sparse light. To the untrained eye, just another pedestrian.
+          Under the surface, the buzz of unhuman energy consumes her bones. With each change
+          she is colder, further from who she really was.
+        </p>
+
+        <div class="ring-tracker">
+          <p class="ring-tracker-label">The Ring's Cost</p>
+          <p class="ring-cost-text">
+            Each use of the ring costs something: identity, warmth, self. The prologue's
+            choices around the ring are not about power. They are about what Riven is willing
+            to lose. By the end, she is not the person who put it on.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     MODULE: SCRIPT — Scenes
+     Add/remove .scene blocks to add/remove scenes
+     ============================================================ -->
+<section id="script" class="section">
+  <div class="site-wrap">
+    <p class="section-label">03 · Script</p>
+    <h2 class="section-title">Prologue <span>Scenes</span></h2>
+
+    <div class="scene-list">
+
+      <!-- === SCENE 01 === -->
+      <article class="scene">
+        <div class="scene-header">
+          <span class="scene-number">Scene 01</span>
+          <span class="scene-name">Surveillance at the Docks</span>
+          <span class="scene-location">Dockyard · Canal Market · Night</span>
+        </div>
+        <div class="scene-body">
+
+          <!-- SCENE IMAGE PLACEHOLDER -->
+          <div class="img-placeholder scene-image-slot"
+               onclick="setImage(this)" data-label="SCENE 01: DOCKS">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+            <span class="img-label">SCENE 01: DOCKS</span>
+            <img src="" alt="Scene 01">
+          </div>
+
+          <div class="scene-content">
+            <div class="scene-beat">
+              <p class="beat-label">Setting</p>
+              <p class="beat-text">Bioluminescent lanterns. The market's din. A sea harvester approaching the pier. Riven watches from the shadows, ring on her finger, reflection writhing in the canal beneath her.</p>
+            </div>
+            <div class="scene-beat">
+              <p class="beat-label">Inciting Event</p>
+              <p class="beat-text">The lanterns die, once, then again. The turbines hesitate. Nobody else notices. Her ring pulses. On the upper deck of the dockyard spike, a figure in dark indigo robes stands knife-edge still, holding what might be a rifle.</p>
+            </div>
+            <!-- PLAYER CHOICE NODE -->
+            <div class="choice-node">
+              <p class="choice-label">Player Choice: The Ring</p>
+              <div class="choice-option"><span class="choice-bullet">▸</span><span>Shift now, move faster, but be seen</span></div>
+              <div class="choice-option"><span class="choice-bullet">▸</span><span>Hold the shift, stay hidden, take longer</span></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- === SCENE 02 === -->
+      <article class="scene">
+        <div class="scene-header">
+          <span class="scene-number">Scene 02</span>
+          <span class="scene-name">The Rooftop Confrontation</span>
+          <span class="scene-location">Dockyard Spike · Upper Deck · Night</span>
+        </div>
+        <div class="scene-body">
+
+          <div class="img-placeholder scene-image-slot"
+               onclick="setImage(this)" data-label="SCENE 02: ROOFTOP">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+            <span class="img-label">SCENE 02: ROOFTOP</span>
+            <img src="" alt="Scene 02">
+          </div>
+
+          <div class="scene-content">
+            <div class="scene-beat">
+              <p class="beat-label">Action</p>
+              <p class="beat-text">Riven charges. The assassin spins, steel-grey eyes wide with something like recognition. The rifle skids over the edge. They fight. Riven pins the assassin down. The ring thuds hot against their chest.</p>
+            </div>
+            <div class="scene-beat">
+              <p class="beat-label">Discovery</p>
+              <p class="beat-text">A scar. New. Carved with the same runes as Riven's ring. She freezes.</p>
+            </div>
+            <div class="dialogue-block">
+              <p class="dialogue-speaker">Riven</p>
+              <p class="dialogue-line">"I don't want to kill you. Don't make me change."</p>
+            </div>
+            <div class="dialogue-block">
+              <p class="dialogue-speaker">Assassin</p>
+              <p class="dialogue-line">"I was dispatched to kill him. But not for what he's done. For what he's going to unleash."</p>
+            </div>
+            <div class="dialogue-block">
+              <p class="dialogue-speaker">Riven</p>
+              <p class="dialogue-line">"What do you mean?"</p>
+            </div>
+            <div class="dialogue-block">
+              <p class="dialogue-speaker">Assassin</p>
+              <p class="dialogue-line">"The sea isn't power alone. It's memory. And he's found something there. Something he won't be able to command."</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- === SCENE 03 === -->
+      <article class="scene">
+        <div class="scene-header">
+          <span class="scene-number">Scene 03</span>
+          <span class="scene-name">The Shutdown</span>
+          <span class="scene-location">Docks · Typis · Night Turning to Silence</span>
+        </div>
+        <div class="scene-body">
+
+          <div class="img-placeholder scene-image-slot"
+               onclick="setImage(this)" data-label="SCENE 03: THE FALL">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+            <span class="img-label">SCENE 03: THE FALL</span>
+            <img src="" alt="Scene 03">
+          </div>
+
+          <div class="scene-content">
+            <div class="scene-beat">
+              <p class="beat-label">Climax</p>
+              <p class="beat-text">The deck groans. A keening whine. The turbines freeze, this time for good. The assassin breaks free, steps backward over the edge. No splash. No sound. Only fog.</p>
+            </div>
+            <div class="scene-beat">
+              <p class="beat-label">Aftermath</p>
+              <p class="beat-text">The turbines don't start again. Typis aches, sighs, and for the first time in a century. Typis stands still. Riven turns away, the assassin's words weighing in her chest. She feels chosen. She loathes it.</p>
+            </div>
+            <div class="scene-beat">
+              <p class="beat-label">Final Line</p>
+              <p class="beat-text" style="font-style:italic; color:var(--accent-dim);">The sea was no longer waiting. And now, neither was she.</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+    </div><!-- /scene-list -->
+  </div>
+</section>
+
+<!-- ============================================================
+     MODULE: FLOWCHART / STRUCTURE
+     SVG is editable — move nodes, change labels, add paths
+     ============================================================ -->
+<section id="flowchart" class="section">
+  <div class="site-wrap">
+    <p class="section-label">04 · Structure</p>
+    <h2 class="section-title">Prologue <span>Map</span></h2>
+    <p style="color:var(--text-secondary); margin-bottom:2rem; font-style:italic;">Hover nodes for details. Click to highlight.</p>
+
+    <div class="flow-svg-wrap">
+      <svg viewBox="0 0 900 420" width="100%" xmlns="http://www.w3.org/2000/svg"
+           style="font-family: 'Cinzel', serif;">
+
+        <!-- BACKGROUND GRID -->
+        <defs>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(0,229,195,0.05)" stroke-width="1"/>
+          </pattern>
+          <filter id="glow-filter">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <rect width="900" height="420" fill="url(#grid)" rx="4"/>
+
+        <!-- CONNECTOR LINES -->
+        <!-- START → Docks -->
+        <line x1="80" y1="210" x2="175" y2="210" stroke="rgba(0,229,195,0.4)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <!-- Docks → Choice -->
+        <line x1="325" y1="210" x2="405" y2="210" stroke="rgba(0,229,195,0.4)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <!-- Choice → Shift -->
+        <path d="M 450 185 Q 450 130 530 130" stroke="rgba(0,229,195,0.3)" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+        <!-- Choice → Hold -->
+        <path d="M 450 235 Q 450 290 530 290" stroke="rgba(0,229,195,0.3)" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+        <!-- Shift → Rooftop -->
+        <path d="M 650 130 Q 720 130 720 175" stroke="rgba(0,229,195,0.3)" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+        <!-- Hold → Rooftop -->
+        <path d="M 650 290 Q 720 290 720 245" stroke="rgba(0,229,195,0.3)" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+        <!-- Rooftop → Shutdown -->
+        <line x1="760" y1="210" x2="830" y2="210" stroke="rgba(0,229,195,0.5)" stroke-width="2"/>
+
+        <!-- NODE: START -->
+        <g class="flow-node" data-tip="Prologue begins. Typis thrums with life." onclick="highlightNode(this)">
+          <ellipse cx="52" cy="210" rx="38" ry="22" fill="#0a1e28" stroke="rgba(0,229,195,0.5)" stroke-width="1.5"/>
+          <text x="52" y="214" text-anchor="middle" font-size="7" fill="rgba(0,229,195,0.8)" letter-spacing="2">START</text>
+        </g>
+
+        <!-- NODE: DOCKS -->
+        <g class="flow-node" data-tip="Scene 01 · Riven watches the target. Lanterns die. Ring pulses." onclick="highlightNode(this)">
+          <rect x="175" y="178" width="150" height="64" rx="4" fill="#0a1e28" stroke="rgba(0,229,195,0.4)" stroke-width="1.5"/>
+          <text x="250" y="206" text-anchor="middle" font-size="8" fill="var(--text-primary)" letter-spacing="1.5">SURVEILLANCE</text>
+          <text x="250" y="222" text-anchor="middle" font-size="7" fill="rgba(0,229,195,0.6)" letter-spacing="1">AT THE DOCKS</text>
+          <text x="250" y="235" text-anchor="middle" font-size="6" fill="#3d6b5e" letter-spacing="1">Scene 01</text>
+        </g>
+
+        <!-- NODE: CHOICE (diamond) -->
+        <g class="flow-node" data-tip="Player Choice · Use the ring now and risk exposure, or hold and take longer." onclick="highlightNode(this)">
+          <polygon points="450,175 490,210 450,245 410,210" fill="#071820" stroke="rgba(0,229,195,0.7)" stroke-width="2"/>
+          <text x="450" y="207" text-anchor="middle" font-size="7" fill="rgba(0,229,195,0.9)" letter-spacing="1.5">THE</text>
+          <text x="450" y="219" text-anchor="middle" font-size="7" fill="rgba(0,229,195,0.9)" letter-spacing="1.5">RING</text>
+        </g>
+
+        <!-- NODE: SHIFT -->
+        <g class="flow-node" data-tip="Riven shifts form · Faster but the Tidewardens may see." onclick="highlightNode(this)">
+          <rect x="530" y="108" width="120" height="44" rx="4" fill="#0a1e28" stroke="rgba(0,229,195,0.3)" stroke-width="1.5"/>
+          <text x="590" y="128" text-anchor="middle" font-size="7" fill="var(--text-secondary)" letter-spacing="1.5">SHIFT FORM</text>
+          <text x="590" y="144" text-anchor="middle" font-size="6" fill="#3d6b5e" letter-spacing="1">exposed</text>
+        </g>
+
+        <!-- NODE: HOLD -->
+        <g class="flow-node" data-tip="Riven holds the shift · Hidden but slower. More risk to the target." onclick="highlightNode(this)">
+          <rect x="530" y="268" width="120" height="44" rx="4" fill="#0a1e28" stroke="rgba(0,229,195,0.3)" stroke-width="1.5"/>
+          <text x="590" y="288" text-anchor="middle" font-size="7" fill="var(--text-secondary)" letter-spacing="1.5">HOLD SHIFT</text>
+          <text x="590" y="304" text-anchor="middle" font-size="6" fill="#3d6b5e" letter-spacing="1">concealed</text>
+        </g>
+
+        <!-- NODE: ROOFTOP -->
+        <g class="flow-node" data-tip="Scene 02 · Confrontation with the assassin. The shared rune is discovered. The target is warned." onclick="highlightNode(this)">
+          <rect x="660" y="178" width="150" height="64" rx="4" fill="#0a1e28" stroke="rgba(0,229,195,0.55)" stroke-width="1.5"/>
+          <text x="735" y="204" text-anchor="middle" font-size="8" fill="var(--text-primary)" letter-spacing="1.5">ROOFTOP</text>
+          <text x="735" y="220" text-anchor="middle" font-size="7" fill="rgba(0,229,195,0.6)" letter-spacing="1">CONFRONTATION</text>
+          <text x="735" y="234" text-anchor="middle" font-size="6" fill="#3d6b5e" letter-spacing="1">Scene 02</text>
+        </g>
+
+        <!-- NODE: SHUTDOWN (red) -->
+        <g class="flow-node" data-tip="Scene 03 · The turbines fail. The city stops. Riven is left alone with the cost." onclick="highlightNode(this)">
+          <ellipse cx="860" cy="210" rx="50" ry="32" fill="#0d1a14" stroke="rgba(139,76,42,0.7)" stroke-width="2"/>
+          <text x="860" y="207" text-anchor="middle" font-size="7" fill="rgba(255,160,100,0.9)" letter-spacing="2">THE</text>
+          <text x="860" y="219" text-anchor="middle" font-size="7" fill="rgba(255,160,100,0.9)" letter-spacing="2">FALL</text>
+          <text x="860" y="233" text-anchor="middle" font-size="6" fill="rgba(139,76,42,0.6)" letter-spacing="1">Scene 03</text>
+        </g>
+
+        <!-- LABELS on paths -->
+        <text x="459" y="155" font-size="6.5" fill="rgba(0,229,195,0.5)" letter-spacing="1">shift</text>
+        <text x="459" y="270" font-size="6.5" fill="rgba(0,229,195,0.5)" letter-spacing="1">hold</text>
+
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     MODULE: STORYBOARD
+     Add/remove .board-panel blocks to add/remove panels.
+     Panels auto-flow in a 3-column grid.
+     ============================================================ -->
+<section id="storyboard" class="section">
+  <div class="site-wrap">
+    <p class="section-label">05 · Storyboard</p>
+    <h2 class="section-title">The Fall of <span>Typis</span></h2>
+    <p style="color:var(--text-secondary); margin-bottom:2.5rem; font-style:italic;">24 panels · 8 per movement · Click any slot to assign an image when ready.</p>
+
+    <!-- === MOVEMENT I === -->
+    <div class="board-sequence-label">
+      <span>Movement I</span>
+      <span class="board-sequence-sub">Surveillance at the Docks · Panels 01–08</span>
+    </div>
+    <div class="board-grid" style="margin-bottom:3rem;">
+
+      <div class="board-panel">
+        <span class="board-num">01</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 01">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 01">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">WIDE: ESTABLISHING</p>
+          <p class="panel-desc">Aerial view of Typis at night. The harbor stretched below. Massive tidal turbines turning slowly in the dark water. Every bioluminescent lantern lit. The city thrumming, alive, unaware.</p>
+        </div>
+      </div>
+
+      <div class="board-panel">
+        <span class="board-num">02</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 02">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 02">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">MEDIUM: RIVEN IN SHADOW</p>
+          <p class="panel-desc">Riven against a rusted railing, half-hidden in the gap between two market stalls. Still. Watching. The canal beneath her reflects her face, distorted by the current, unrecognizable.</p>
+        </div>
+      </div>
+
+      <div class="board-panel">
+        <span class="board-num">03</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 03">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 03">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">CLOSE: THE RING</p>
+          <p class="panel-desc">Extreme close on Riven's hand. The grey ring on her finger, worn runes barely catching the lantern light. She is twirling it. A nervous habit. Something she does without noticing anymore.</p>
+        </div>
+      </div>
+
+      <div class="board-panel">
+        <span class="board-num">04</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 04">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 04">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">WIDE: THE TARGET</p>
+          <p class="panel-desc">The sea harvester docking. Riven's target visible in the crowd, too still among moving bodies, like a stone in a current. Children play at the water's edge nearby. Nobody else sees what Riven sees.</p>
+        </div>
+      </div>
+
+      <div class="board-panel">
+        <span class="board-num">05</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 05">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 05">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">SEQUENCE: LIGHTS DYING</p>
+          <p class="panel-desc">Three small panels in one: a lantern gutters. A second goes dark. A third. The wave of darkness moving through the canal street like something breathing out. The turbines stutter, just a beat, then recover.</p>
+        </div>
+      </div>
+
+      <div class="board-panel">
+        <span class="board-num">06</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 06">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 06">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">CLOSE: RIVEN'S HAND</p>
+          <p class="panel-desc">The ring pulses. A dull glow through the worn runes, not bright, not dramatic, just present. Riven's fingers curl closed around it. She shoves her hand into her coat pocket. Does not look at it again.</p>
+        </div>
+      </div>
+
+      <div class="board-panel">
+        <span class="board-num">07</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 07">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 07">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">LONG: THE SPIKE</p>
+          <p class="panel-desc">Riven's POV: the dockyard spike rising above the crowd. And there, on the upper deck, half-shrouded in fog: a figure in dark indigo robes. Kneeling. Still. The shape of a rifle across their back.</p>
+        </div>
+      </div>
+
+      <div class="board-panel">
+        <span class="board-num">08</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 08">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 08">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">MEDIUM: RIVEN DECIDES</p>
+          <p class="panel-desc">Riven's face in profile. The market noise, the crowd, the target, all behind her now. She is already moving. No hesitation visible. Whatever she felt about the ring, she has put it somewhere she can't reach.</p>
+        </div>
+      </div>
+
+    </div><!-- /movement I -->
+
+    <!-- === MOVEMENT II === -->
+    <div class="board-sequence-label">
+      <span>Movement II</span>
+      <span class="board-sequence-sub">The Rooftop Confrontation · Panels 09–16</span>
+    </div>
+    <div class="board-grid" style="margin-bottom:3rem;">
+
+      <div class="board-panel">
+        <span class="board-num">09</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 09">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 09">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">WIDE: THE CLIMB</p>
+          <p class="panel-desc">Riven ascending the tower's exterior stairs. The city spread below her, canal light, steam, the crowd oblivious. The fog thickening around her as she rises. The top of the spike disappearing into white.</p>
+        </div>
+      </div>
+
+      <div class="board-panel">
+        <span class="board-num">10</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 10">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 10">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">CLOSE: BOOTS ON IRON</p>
+          <p class="panel-desc">Low angle: Riven's boots on the wet grating of the upper deck. Each step deliberate. The fog pressing in from all sides. Somewhere ahead, behind the white: the assassin, still kneeling, still waiting.</p>
+        </div>
+      </div>
+
+      <div class="board-panel">
+        <span class="board-num">11</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 11">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 11">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">MEDIUM: THE CHARGE</p>
+          <p class="panel-desc">The assassin begins to turn, one beat too late. Riven is already in motion. No hesitation. The moment before impact: the assassin's eyes catching the light, wide, something in them that is not fear.</p>
+        </div>
+      </div>
+
+      <div class="board-panel">
+        <span class="board-num">12</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 12">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 12">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">WIDE: IMPACT</p>
+          <p class="panel-desc">Two bodies hitting the deck. The rifle leaving the assassin's hands, airborne, catching light for a single frame before it clears the railing and disappears. The city far below. The fog closing in around them.</p>
+        </div>
+      </div>
+
+      <div class="board-panel">
+        <span class="board-num">13</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 13">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 13">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">CLOSE: BLADE AND WRIST</p>
+          <p class="panel-desc">The assassin's sleeve-blade flash. Riven catching the wrist. Pressing it flat. Their face inches apart. The ring on Riven's finger humming against the assassin's chest, both of them feeling it.</p>
+        </div>
+      </div>
+
+      <div class="board-panel">
+        <span class="board-num">14</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 14">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 14">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">EXTREME CLOSE: THE SCAR</p>
+          <p class="panel-desc">The assassin's inner wrist. A scar, not old, not healed, carved in the same runes as Riven's ring. The lines still raw. A beat of complete stillness in the panel. Nothing else visible. Just this.</p>
+        </div>
+      </div>
+
+      <div class="board-panel">
+        <span class="board-num">15</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 15">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 15">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">MEDIUM: DIALOGUE</p>
+          <p class="panel-desc">The assassin's mask half-off, rebreather hanging loose. Their face visible. Too human. Speaking quietly. Riven's grip still on their collar. The fog around both of them. Neither moving. The city below, still unaware.</p>
+        </div>
+      </div>
+
+      <div class="board-panel">
+        <span class="board-num">16</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 16">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 16">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">WIDE: THE STEP BACK</p>
+          <p class="panel-desc">The assassin steps backward off the deck. Deliberate. Unhurried. Riven lurching forward too late, her hand extended, closing on nothing. Below: the sea. No splash. No sound. The fog where they were is already empty.</p>
+        </div>
+      </div>
+
+    </div><!-- /movement II -->
+
+    <!-- === MOVEMENT III === -->
+    <div class="board-sequence-label">
+      <span>Movement III</span>
+      <span class="board-sequence-sub">The Shutdown · Panels 17–24</span>
+    </div>
+    <div class="board-grid">
+
+      <div class="board-panel">
+        <span class="board-num">17</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 17">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 17">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">WIDE: RIVEN AT THE RAILING</p>
+          <p class="panel-desc">Riven alone on the upper deck. Looking over the railing into fog and dark water. The harbor visible beneath, the turbines there, still rotating. For now. A panel of quiet before everything changes.</p>
+        </div>
+      </div>
+
+      <div class="board-panel">
+        <span class="board-num">18</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 18">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 18">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">CLOSE: TURBINES SLOWING</p>
+          <p class="panel-desc">Below the waterline: the great turbine blades, slowing. Not dramatically. Just wrong. The way a heart skips. The way something living becomes something that was. The water churning around them as they stop.</p>
+        </div>
+      </div>
+
+      <div class="board-panel">
+        <span class="board-num">19</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 19">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 19">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">WIDE: THE CITY DARKENING</p>
+          <p class="panel-desc">Aerial view again, mirroring Panel 01. But now the lanterns are going out in sequence, canal by canal, district by district. The city folding into dark from the harbor outward, like something exhaling for the last time.</p>
+        </div>
+      </div>
+
+      <div class="board-panel">
+        <span class="board-num">20</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 20">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 20">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">MEDIUM: PANIC IN THE STREETS</p>
+          <p class="panel-desc">Below in the market, the crowd beginning to understand. Merchants stopping. Children pulled away from the canal edge. The steam pipes falling silent one by one. The sound leaving the city before the light does.</p>
+        </div>
+      </div>
+
+      <div class="board-panel">
+        <span class="board-num">21</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 21">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 21">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">CLOSE: RIVEN'S FACE</p>
+          <p class="panel-desc">Riven watching the city go dark from above. Her expression: not shock. Not satisfaction. Something colder. She knew this was coming, or part of her did. The ring is still on her finger. She hasn't taken it off.</p>
+        </div>
+      </div>
+
+      <div class="board-panel">
+        <span class="board-num">22</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 22">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 22">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">WIDE: TYPIS STILL</p>
+          <p class="panel-desc">The city at rest. Every turbine frozen. The canals motionless. For the first time in a century, Typis is not moving. The panel is nearly black, only the faint bioluminescence of the sea creatures still faintly visible below the water's surface.</p>
+        </div>
+      </div>
+
+      <div class="board-panel">
+        <span class="board-num">23</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 23">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 23">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">CLOSE: THE RING, AGAIN</p>
+          <p class="panel-desc">Mirroring Panel 03: Riven's hand. The ring on her finger. But now the runes are dim. The light that was in them, gone somewhere else. Her hand is not shaking. That is what makes it worse.</p>
+        </div>
+      </div>
+
+      <div class="board-panel">
+        <span class="board-num">24</span>
+        <div class="img-placeholder panel-img-slot" onclick="setImage(this)" data-label="PANEL 24">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span class="img-label">ADD IMAGE</span>
+          <img src="" alt="Panel 24">
+        </div>
+        <div class="panel-text-body">
+          <p class="panel-shot">WIDE: FINAL</p>
+          <p class="panel-desc">Riven's silhouette on the spike, above a dark city, above a dark sea. Small. The scale of everything around her made clear. She is already turning to leave. The sea below: still, vast, waiting for nothing anymore.</p>
+        </div>
+      </div>
+
+    </div><!-- /movement III -->
+
+  </div>
+</section>
+
+</main>
+
+<!-- ============================================================
+     FOOTER — edit credit/title text here
+     ============================================================ -->
+<footer>
+  <div class="divider" style="margin-bottom:1.5rem;"><div class="divider-line"></div><span class="divider-glyph">◇</span><div class="divider-line"></div></div>
+  <p>TYPIS: Prologue Game Design Document</p>
+  <p style="margin-top:0.5rem;"><span>David Jones</span> · ENGL 200 · Final Project</p>
+</footer>
+
+<!-- ============================================================
+     JAVASCRIPT — flowchart interaction + image placeholders
+     ============================================================ -->
+<script>
+/* ---- FLOWCHART TOOLTIP ---- */
+const tooltip = document.getElementById('flowTooltip');
+document.querySelectorAll('.flow-node').forEach(node => {
+  node.addEventListener('mousemove', e => {
+    const tip = node.dataset.tip;
+    if (!tip) return;
+    tooltip.textContent = tip;
+    tooltip.style.display = 'block';
+    tooltip.style.left = (e.clientX + 14) + 'px';
+    tooltip.style.top  = (e.clientY - 10) + 'px';
+  });
+  node.addEventListener('mouseleave', () => {
+    tooltip.style.display = 'none';
+  });
+});
+
+/* ---- FLOWCHART NODE HIGHLIGHT ---- */
+function highlightNode(el) {
+  document.querySelectorAll('.flow-node rect, .flow-node ellipse, .flow-node polygon').forEach(s => {
+    s.style.fill = '';
+    s.style.filter = '';
+  });
+  const shape = el.querySelector('rect, ellipse, polygon');
+  if (shape) {
+    shape.style.fill = 'rgba(0,229,195,0.15)';
+    shape.style.filter = 'drop-shadow(0 0 8px rgba(0,229,195,0.5))';
+  }
+}
+
+/* ---- IMAGE PLACEHOLDER HANDLER ----
+   Click any placeholder to enter a file path or URL.
+   Paste a relative path (e.g., "images/riven.jpg") or a full URL.
+   The placeholder will switch to show the image.
+*/
+function setImage(el) {
+  const current = el.querySelector('img').src;
+  const input = prompt(
+    'Enter image path or URL:\n(e.g., images/panel01.jpg  or  https://...)',
+    current && !current.endsWith('/') ? current : ''
+  );
+  if (input && input.trim()) {
+    const img = el.querySelector('img');
+    img.src = input.trim();
+    img.alt = el.dataset.label || 'image';
+    el.classList.add('has-image');
+    img.onerror = () => {
+      el.classList.remove('has-image');
+      alert('Could not load image: ' + input.trim());
+    };
+  }
+}
+
+/* ---- NAV ACTIVE STATE on scroll ---- */
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(a => a.style.color = '');
+      const active = document.querySelector(`.nav-links a[href="#${entry.target.id}"]`);
+      if (active) active.style.color = 'var(--accent-primary)';
+    }
+  });
+}, { threshold: 0.4 });
+
+sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
