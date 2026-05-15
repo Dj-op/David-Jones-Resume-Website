@@ -3,57 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>David Jones – Resume</title>
+<title>David Jones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #111111;
+    --mid: #444444;
+    --light: #888888;
+    --rule: #cccccc;
+    --bg: #ffffff;
+    --nav-bg: #111111;
+    --nav-text: #f5f0e8;
+  }
 
   body {
     font-family: 'DM Sans', sans-serif;
     font-size: 10.5pt;
-    color: #1a1a1a;
-    background: #fff;
-    max-width: 780px;
-    margin: 0 auto;
-    padding: 48px 56px;
+    color: var(--ink);
+    background: var(--bg);
     line-height: 1.55;
   }
 
-  /* Header */
-  .header { border-bottom: 2px solid #1a1a1a; padding-bottom: 12px; margin-bottom: 20px; }
-  .name {
-    font-family: 'EB Garamond', serif;
-    font-size: 28pt;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    line-height: 1;
-    margin-bottom: 6px;
-  }
-  .contact {
-    font-size: 9.5pt;
-    color: #444;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 18px;
-  }
-  .contact span::before { content: ''; }
-
-  /* Sections */
-  section { margin-bottom: 18px; }
-  .section-title {
-    font-family: 'EB Garamond', serif;
-    font-size: 12pt;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    border-bottom: 1px solid #bbb;
-    padding-bottom: 3px;
-    margin-bottom: 10px;
-    color: #111;
-  }
-
-    /* NAV */
+  /* NAV */
   nav {
     background: var(--nav-bg);
     padding: 14px 48px;
@@ -82,8 +56,69 @@
   .nav-links a:hover { color: var(--nav-text); }
   .nav-links a.active { color: var(--nav-text); }
 
-  /* Experience entries */
-  .entry { margin-bottom: 13px; }
+  /* PAGE */
+  .page {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 44px 56px 64px;
+  }
+
+  /* HEADER */
+  .header {
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 14px;
+    margin-bottom: 26px;
+  }
+  .name {
+    font-family: 'EB Garamond', serif;
+    font-size: 30pt;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .contact {
+    font-size: 9.5pt;
+    color: var(--mid);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+  }
+
+  /* SECTIONS */
+  section { margin-bottom: 22px; }
+  .section-title {
+    font-family: 'EB Garamond', serif;
+    font-size: 11.5pt;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 4px;
+    margin-bottom: 13px;
+    color: var(--ink);
+  }
+
+  /* SKILLS */
+  .skills-group { margin-bottom: 10px; }
+  .skills-label {
+    font-size: 9pt;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--light);
+    margin-bottom: 5px;
+  }
+  .skills-grid { display: flex; flex-wrap: wrap; }
+  .skill-tag {
+    font-size: 9.5pt;
+    color: var(--mid);
+    padding-right: 16px;
+  }
+  .skill-tag::after { content: '·'; margin-left: 16px; color: var(--rule); }
+  .skill-tag:last-child::after { content: ''; }
+
+  /* EXPERIENCE */
+  .entry { margin-bottom: 15px; }
   .entry-header {
     display: flex;
     justify-content: space-between;
@@ -91,63 +126,52 @@
     gap: 8px;
     flex-wrap: wrap;
   }
-  .job-title {
-    font-weight: 600;
-    font-size: 10.5pt;
-  }
-  .date {
-    font-size: 9.5pt;
-    color: #555;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
+  .job-title { font-weight: 600; font-size: 10.5pt; }
+  .date { font-size: 9pt; color: var(--light); white-space: nowrap; }
   .org {
     font-size: 9.5pt;
-    color: #444;
-    margin-bottom: 4px;
+    color: var(--mid);
     font-style: italic;
+    margin-bottom: 5px;
+    margin-top: 1px;
   }
-  ul {
-    padding-left: 16px;
-    margin-top: 3px;
-  }
-  li {
-    margin-bottom: 2px;
-    font-size: 10pt;
-  }
+  ul { padding-left: 16px; margin-top: 4px; }
+  li { margin-bottom: 3px; font-size: 10pt; color: #222; }
 
-  /* Skills */
-  .skills-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4px 20px;
-    font-size: 10pt;
-  }
-  .skill-item::before { content: '· '; color: #888; }
-
-  /* Education */
+  /* EDUCATION */
   .edu-entry { margin-bottom: 12px; }
-  .edu-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
   .edu-school { font-weight: 600; font-size: 10.5pt; }
-  .edu-degree { font-style: italic; font-size: 10pt; color: #333; margin-bottom: 2px; }
-  .edu-details { font-size: 9.5pt; color: #444; }
+  .edu-degree { font-style: italic; font-size: 10pt; color: #333; margin: 2px 0; }
+  .edu-details { font-size: 9.5pt; color: var(--mid); }
 
-  /* Gap marker */
-  .gap { color: #c0392b; font-style: italic; }
+  /* PROJECTS */
+  .project-entry { margin-bottom: 10px; }
+  .project-title { font-weight: 600; font-size: 10.5pt; }
+  .project-sub { font-size: 9.5pt; color: var(--mid); font-style: italic; }
+
+  .portfolio-link {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 9.5pt;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 1px;
+  }
+  .portfolio-link:hover { color: var(--light); border-color: var(--light); }
 
   @media print {
-    body { padding: 32px 40px; }
+    nav { display: none; }
+    .page { padding: 32px 40px; }
+  }
+  @media (max-width: 600px) {
+    .page { padding: 28px 24px; }
+    nav { padding: 12px 20px; }
   }
 </style>
 </head>
 <body>
-  
+
 <nav>
   <span class="nav-name">David Jones</span>
   <div class="nav-links">
@@ -156,166 +180,153 @@
   </div>
 </nav>
 
-<div class="header">
-  <div class="name">David Jones</div>
-  <div class="contact">
-    <span>Schenectady, NY</span>
-    <span>(838) 245-8440</span>
-    <span>djop5957@gmail.com</span>
+<div class="page">
+
+  <div class="header">
+    <div class="name">David Jones</div>
+    <div class="contact">
+      <span>Schenectady, NY</span>
+      <span>(838) 245-8440</span>
+      <span>djop5957@gmail.com</span>
+    </div>
   </div>
+
+  <!-- SUMMARY -->
+  <section>
+    <div class="section-title">Summary</div>
+    <p>Digital Communications &amp; Storytelling student at SUNY Canton with a Marketing minor. Produces social media content that has reached 8,000+ viewers, builds websites from scratch using HTML, and has hands-on experience in public relations, video editing, and community outreach.</p>
+  </section>
+
+  <!-- SKILLS -->
+  <section>
+    <div class="section-title">Skills</div>
+    <div class="skills-group">
+      <div class="skills-label">Technical</div>
+      <div class="skills-grid">
+        <span class="skill-tag">HTML &amp; Web Design</span>
+        <span class="skill-tag">Adobe Premiere Pro</span>
+        <span class="skill-tag">Microsoft Excel</span>
+        <span class="skill-tag">SQL Server</span>
+        <span class="skill-tag">Python</span>
+        <span class="skill-tag">C#</span>
+        <span class="skill-tag">Social Media Analytics</span>
+        <span class="skill-tag">Mobile Media</span>
+      </div>
+    </div>
+    <div class="skills-group" style="margin-top:10px;">
+      <div class="skills-label">Communication &amp; Leadership</div>
+      <div class="skills-grid">
+        <span class="skill-tag">Public Speaking</span>
+        <span class="skill-tag">Interviewing</span>
+        <span class="skill-tag">Community Outreach</span>
+        <span class="skill-tag">Team Leadership</span>
+        <span class="skill-tag">Marketing</span>
+        <span class="skill-tag">Data Entry &amp; Analysis</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section>
+    <div class="section-title">Experience</div>
+
+    <div class="entry">
+      <div class="entry-header">
+        <span class="job-title">Public Relations Intern</span>
+        <span class="date">01/2026 – Present</span>
+      </div>
+      <div class="org">SUNY Canton, Canton, NY</div>
+      <ul>
+        <li>Produce and edit short-form video content for SUNY Canton's Instagram — one reel reached 8,448 views at a school of under 3,000 students.</li>
+        <li>50+ hours of hands-on video editing in Adobe Premiere Pro, covering footage capture, pacing, color, and captions for social media.</li>
+        <li>Interview students and staff on campus for content series, including career fair and campus life features.</li>
+        <li>Represent the college through public speaking at campus events.</li>
+        <li>Study Instagram analytics and track social media strategies across comparable colleges to shape content decisions.</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-header">
+        <span class="job-title">Orientation Leader</span>
+        <span class="date">08/2025 – Present</span>
+      </div>
+      <div class="org">SUNY Canton, Canton, NY</div>
+      <ul>
+        <li>Welcome incoming students each semester and serve as a peer resource during their transition to college.</li>
+        <li>Run group activities and campus introductions to help new students find their footing.</li>
+        <li>Act as a point of contact at new student events and field questions about campus life, resources, and academics.</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-header">
+        <span class="job-title">Canvasser</span>
+        <span class="date">06/2023 – Present</span>
+      </div>
+      <div class="org">All of Us, Schenectady, NY</div>
+      <ul>
+        <li>Carry out door-to-door community outreach each summer to raise awareness about local programs and services.</li>
+        <li>Register voters through direct face-to-face conversations and deliver campaign messages to community members.</li>
+        <li>Coordinate material distribution to drive event attendance and handle data entry to keep members informed.</li>
+        <li>Track outreach data each cycle to tighten targeting and make better use of resources.</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-header">
+        <span class="job-title">Software Intern</span>
+        <span class="date">07/2022 – 08/2022</span>
+      </div>
+      <div class="org">SCube, Schenectady, NY</div>
+      <ul>
+        <li>Analyzed municipal data sets to support business decisions.</li>
+        <li>Validated and organized data using Microsoft Excel and SQL Server.</li>
+        <li>Wrote automated data processing scripts in Python and C#.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section>
+    <div class="section-title">Projects</div>
+    <div class="project-entry">
+      <div class="project-title">Interactive Moby Dick Educational Website</div>
+      <div class="project-sub">Web Design Coursework — SUNY Canton</div>
+    </div>
+    <div class="project-entry">
+      <div class="project-title">TYPIS: Prologue — Game Concept Website</div>
+      <div class="project-sub">Web Design Final Project — SUNY Canton</div>
+    </div>
+    <div class="project-entry">
+      <div class="project-title">Alteria — Group Narrative Project Website</div>
+      <div class="project-sub">Game Narrative Class — SUNY Canton</div>
+    </div>
+    <a class="portfolio-link" href="portfolio.html">View full project details →</a>
+  </section>
+
+  <!-- EDUCATION -->
+  <section>
+    <div class="section-title">Education</div>
+
+    <div class="edu-entry">
+      <div class="entry-header">
+        <span class="edu-school">SUNY Canton</span>
+        <span class="date">2023 – Present</span>
+      </div>
+      <div class="edu-degree">B.S. Digital Communications &amp; Storytelling &nbsp;|&nbsp; Marketing Minor</div>
+      <div class="edu-details">Relevant Coursework: Web Design, Marketing, Mobile Media</div>
+      <div class="edu-details" style="margin-top:3px;">Music Club Founder &amp; President</div>
+    </div>
+
+    <div class="edu-entry">
+      <div class="entry-header">
+        <span class="edu-school">Schenectady High School</span>
+        <span class="date">2019 – 2023</span>
+      </div>
+      <div class="edu-details">National Honor Society &nbsp;·&nbsp; Class Treasurer (2023) &nbsp;·&nbsp; Sponsor A Scholar &nbsp;·&nbsp; E-Sports &nbsp;·&nbsp; Band &nbsp;·&nbsp; Dance Connections</div>
+    </div>
+  </section>
+
 </div>
-
-  
-
-<!-- SUMMARY -->
-<section>
-  <div class="section-title">Summary</div>
-  <p>Digital Communications &amp; Storytelling student at SUNY Canton with a Marketing minor and experience in public relations, web design, and community outreach. Comfortable working with HTML, social media, and data tools, with four years of direct public-facing outreach behind me.</p>
-</section>
-
-<!-- SKILLS -->
-<section>
-  <div class="section-title">Skills</div>
-  <div class="skills-grid">
-    <div class="skill-item">HTML &amp; Web Design</div>
-    <div class="skill-item">Social Media</div>
-    <div class="skill-item">Microsoft Excel</div>
-    <div class="skill-item">Microsoft SQL Server</div>
-    <div class="skill-item">Python</div>
-    <div class="skill-item">C#</div>
-    <div class="skill-item">Data Entry &amp; Analysis</div>
-    <div class="skill-item">Public Speaking</div>
-    <div class="skill-item">Team Leadership</div>
-    <div class="skill-item">Marketing</div>
-    <div class="skill-item">Canvassing &amp; Outreach</div>
-    <div class="skill-item">Mobile Media</div>
-  </div>
-</section>
-
-<!-- EXPERIENCE -->
-<section>
-  <div class="section-title">Experience</div>
-
-  <div class="entry">
-    <div class="entry-header">
-      <span class="job-title">Public Relations Intern</span>
-      <span class="date">01/2026 – Present</span>
-    </div>
-    <div class="org">SUNY Canton, Canton, NY</div>
-    <ul>
-      <li>Produce and edit short-form video content for SUNY Canton's Instagram, including interview-style reels — one reached 8,448 views at a school of under 3,000 students.</li>
-      <li>Accumulated 50+ hours of video editing experience using Adobe Premiere Pro, covering footage capture, pacing, color grading, and captioning for social media.</li>
-      <li>Conduct on-campus interviews with students and staff for content series, including career fair and campus life features.</li>
-      <li>Represent the college through public speaking at campus events.</li>
-      <li>Analyze Instagram engagement metrics and study social media strategies used by comparable colleges to inform content decisions.</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-header">
-      <span class="job-title">Orientation Leader</span>
-      <span class="date">08/2025 – Present</span>
-    </div>
-    <div class="org">SUNY Canton, Canton, NY</div>
-    <ul>
-      <li>Guide incoming students through orientation each semester and serve as a peer resource during their transition to college.</li>
-      <li>Facilitate group activities and campus introductions to help new students get comfortable and connected.</li>
-      <li>Represent the college at new student events and answer questions about campus life, resources, and academics.</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-header">
-      <span class="job-title">Canvasser</span>
-      <span class="date">06/2023 – Present</span>
-    </div>
-    <div class="org">All of Us, Schenectady, NY</div>
-    <ul>
-      <li>Conduct door-to-door community outreach each summer to raise awareness about local programs and services.</li>
-      <li>Register voters through direct face-to-face conversations and communicate campaign messages to community members.</li>
-      <li>Coordinate material distribution to boost event attendance and manage data entry to keep members informed.</li>
-      <li>Track and analyze outreach data to refine targeting strategies and use resources more efficiently.</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-header">
-      <span class="job-title">Software Intern</span>
-      <span class="date">07/2022 – 08/2022</span>
-    </div>
-    <div class="org">SCube, Schenectady, NY</div>
-    <ul>
-      <li>Analyzed municipal data to support business decisions.</li>
-      <li>Managed and validated data using Microsoft Excel and SQL Server.</li>
-      <li>Built automated data processing scripts in Python and C#.</li>
-    </ul>
-  </div>
-</section>
-
-<!-- PROJECTS -->
-<section>
-  <div class="section-title">Projects</div>
-
-  <div class="entry">
-    <div class="entry-header">
-      <span class="job-title">Interactive Moby Dick Educational Website</span>
-      <span class="date">Web Design Coursework</span>
-    </div>
-    <div class="org">SUNY Canton</div>
-    <ul>
-      <li>Built an interactive educational site on Moby Dick featuring a clickable sperm whale anatomy diagram — users click each body part to learn its biological function and historical use in the whaling industry.</li>
-      <li>Designed with a period-appropriate aesthetic and smooth CSS transitions to zoom into selected anatomy regions.</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-header">
-      <span class="job-title">Personal Game Concept Website</span>
-      <span class="date">Web Design Coursework</span>
-    </div>
-    <div class="org">SUNY Canton</div>
-    <ul>
-      <li>Designed and built a website as the final project for Web Design, centered around an original game concept in development.</li>
-      <li>Created site structure, layout, and visual design from scratch using HTML and CSS.</li>
-    </ul>
-  </div>
-
-  <div class="entry">
-    <div class="entry-header">
-      <span class="job-title">Alteria — Group Project Website</span>
-      <span class="date">Game Narrative Class</span>
-    </div>
-    <div class="org">SUNY Canton</div>
-    <ul>
-      <li>Built the team website for Alteria, a collaborative game narrative class project, which served as a central hub organizing the full workgroup's materials.</li>
-      <li>Developed an interactive chapter map allowing users to click through the game's story scenes and follow the narrative flow.</li>
-      <li>Contributed as Narrative Designer, Music Designer, and Web Developer — writing plot, characters, and branching endings alongside building the site.</li>
-    </ul>
-  </div>
-</section>
-
-<!-- EDUCATION -->
-<section>
-  <div class="section-title">Education</div>
-
-  <div class="edu-entry">
-    <div class="edu-header">
-      <span class="edu-school">SUNY Canton</span>
-      <span class="date">2023 – Present</span>
-    </div>
-    <div class="edu-degree">B.S. Digital Communications &amp; Storytelling &nbsp;|&nbsp; Marketing Minor</div>
-    <div class="edu-details">Relevant Coursework: Web Design, Marketing, Mobile Media</div>
-    <div class="edu-details" style="margin-top:3px;">Music Club Founder &amp; President</div>
-  </div>
-
-  <div class="edu-entry">
-    <div class="entry-header">
-      <span class="edu-school">Schenectady High School</span>
-      <span class="date">2019 – 2023</span>
-    </div>
-    <div class="edu-details">National Honor Society &nbsp;·&nbsp; Class Treasurer (2023) &nbsp;·&nbsp; Sponsor A Scholar &nbsp;·&nbsp; E-Sports &nbsp;·&nbsp; Band &nbsp;·&nbsp; Dance Connections</div>
-  </div>
-</section>
-
 </body>
 </html>
