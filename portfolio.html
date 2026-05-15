@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>portfolio</title>
+<title>David Jones — Portfolio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Share+Tech+Mono&family=Cinzel:wght@400;900&display=swap" rel="stylesheet">
 <style>
@@ -29,7 +29,6 @@
     cursor: crosshair;
   }
 
-  /* grain overlay */
   body::after {
     content: '';
     position: fixed;
@@ -39,47 +38,141 @@
     z-index: 999;
   }
 
-  /* ── HEADER ── */
-  header {
-    border-bottom: 2px solid var(--ink);
-    padding: 48px 60px 36px;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: end;
-    gap: 20px;
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: #0c0c0c;
+    padding: 14px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #2a2a2a;
+  }
+  .nav-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 15pt;
+    color: #f0ebe3;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a {
+    color: #9a8f84;
+    text-decoration: none;
+    font-size: 9pt;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: 'Share Tech Mono', monospace;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: #f0ebe3; }
+
+  /* ── HERO ── */
+  .hero {
+    height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
   }
 
-  .name {
+  .hero-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    filter: grayscale(15%) contrast(1.05) brightness(0.75);
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(12,12,12,0.85) 0%, rgba(12,12,12,0.2) 50%, rgba(12,12,12,0.1) 100%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 0 60px 64px;
+    width: 100%;
+  }
+
+  .hero-name {
     font-family: 'DM Serif Display', serif;
-    font-size: clamp(48px, 8vw, 100px);
+    font-size: clamp(52px, 9vw, 110px);
     line-height: 0.9;
     letter-spacing: -0.02em;
-    color: var(--ink);
+    color: #f0ebe3;
+    margin-bottom: 16px;
   }
 
-  .name em {
+  .hero-name em {
     font-style: italic;
     color: var(--accent);
   }
 
-  .header-meta {
-    text-align: right;
-    color: var(--muted);
+  .hero-sub {
     font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #9a8f84;
+    margin-bottom: 32px;
+  }
+
+  .hero-social {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 48px;
+  }
+
+  .hero-social a {
+    font-size: 9px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    line-height: 2;
-  }
-
-  .header-meta a {
-    color: var(--accent);
+    color: #f0ebe3;
     text-decoration: none;
-    display: block;
+    padding: 7px 16px;
+    border: 1px solid rgba(240,235,227,0.3);
+    transition: border-color 0.2s, color 0.2s;
   }
 
-  .header-meta a:hover { text-decoration: underline; }
+  .hero-social a:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 
-  /* ── MARQUEE STRIP ── */
+  .scroll-cue {
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #9a8f84;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .scroll-cue::after {
+    content: '';
+    display: block;
+    width: 1px;
+    height: 40px;
+    background: #9a8f84;
+    animation: scrollpulse 2s ease-in-out infinite;
+  }
+
+  @keyframes scrollpulse {
+    0%, 100% { opacity: 0.4; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.2); }
+  }
+
+  /* ── MARQUEE ── */
   .strip {
     background: var(--ink);
     color: var(--paper);
@@ -90,57 +183,15 @@
     overflow: hidden;
     white-space: nowrap;
   }
-
   .strip-inner {
     display: inline-block;
     animation: scroll 28s linear infinite;
   }
-
   .strip-inner span { margin: 0 32px; }
   .strip-inner .dot { color: var(--accent); }
-
   @keyframes scroll {
     from { transform: translateX(0); }
     to   { transform: translateX(-50%); }
-  }
-
-  /* ── MAIN LAYOUT ── */
-  main {
-    padding: 0 60px 80px;
-  }
-
-  /* ── INTRO ── */
-  .intro {
-    padding: 56px 0 48px;
-    border-bottom: 1px solid var(--border);
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    align-items: end;
-  }
-
-  .intro-text {
-    font-family: 'DM Serif Display', serif;
-    font-size: clamp(18px, 2.5vw, 26px);
-    line-height: 1.4;
-    font-style: italic;
-    color: var(--ink);
-  }
-
-  .intro-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: flex-end;
-  }
-
-  .tag {
-    font-size: 9px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    padding: 5px 12px;
-    border: 1px solid var(--ink);
-    color: var(--ink);
   }
 
   /* ── SECTION LABEL ── */
@@ -154,7 +205,6 @@
     align-items: center;
     gap: 16px;
   }
-
   .section-label::after {
     content: '';
     flex: 1;
@@ -162,11 +212,90 @@
     background: var(--border);
   }
 
-  /* ── PROJECT CARDS ── */
+  /* ── SOCIAL SECTION ── */
+  .social-section {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 64px 60px 72px;
+  }
+
+  .social-context {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 52px;
+    align-items: center;
+    margin-bottom: 56px;
+    padding-bottom: 56px;
+    border-bottom: 1px solid #2a2a2a;
+  }
+
+  .social-stat {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(36px, 5vw, 64px);
+    line-height: 1;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .social-stat-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #9a9490;
+    margin-bottom: 20px;
+  }
+
+  .social-desc {
+    font-size: 12px;
+    color: #9a9490;
+    line-height: 1.9;
+  }
+
+  .social-tags {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+
+  .social-tag {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #9a9490;
+  }
+  .social-tag::before { content: '— '; }
+
+  .reels-label {
+    font-size: 9px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: #9a9490;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .reels-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #2a2a2a;
+  }
+
+  .reels-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ── PROJECTS ── */
+  main { padding: 0 60px 80px; }
+
   .projects {
     display: flex;
     flex-direction: column;
-    gap: 0;
   }
 
   .project {
@@ -179,9 +308,7 @@
     transition: background 0.2s;
     cursor: default;
   }
-
   .project:last-child { border-bottom: 1px solid var(--border); }
-
   .project:hover { background: var(--card-bg); margin: 0 -20px; padding-left: 20px; padding-right: 20px; }
 
   .project-num {
@@ -191,8 +318,6 @@
     padding-top: 6px;
   }
 
-  .project-body { }
-
   .project-title {
     font-family: 'DM Serif Display', serif;
     font-size: clamp(22px, 3vw, 36px);
@@ -201,11 +326,7 @@
     margin-bottom: 10px;
     color: var(--ink);
   }
-
-  .project-title em {
-    font-style: italic;
-    color: var(--accent);
-  }
+  .project-title em { font-style: italic; color: var(--accent); }
 
   .project-desc {
     color: #4a4540;
@@ -215,19 +336,13 @@
     margin-bottom: 16px;
   }
 
-  .project-stack {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
+  .project-stack { display: flex; gap: 12px; flex-wrap: wrap; }
   .stack-item {
     font-size: 9px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--muted);
   }
-
   .stack-item::before { content: '— '; }
 
   .project-link {
@@ -244,35 +359,7 @@
     align-self: start;
     margin-top: 6px;
   }
-
   .project-link:hover { background: var(--accent); }
-
-  /* ── ACCENT BLOCK ── */
-  .accent-block {
-    background: var(--ink);
-    color: var(--paper);
-    padding: 48px 52px;
-    margin: 60px 0;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-    align-items: center;
-  }
-
-  .accent-block-text {
-    font-family: 'DM Serif Display', serif;
-    font-size: clamp(20px, 2.5vw, 28px);
-    font-style: italic;
-    line-height: 1.4;
-  }
-
-  .accent-block-text em { color: var(--accent); font-style: normal; }
-
-  .accent-block-detail {
-    font-size: 11px;
-    color: #9a9490;
-    line-height: 1.9;
-  }
 
   /* ── FOOTER ── */
   footer {
@@ -286,36 +373,47 @@
     text-transform: uppercase;
     color: var(--muted);
   }
-
   footer a { color: var(--accent); text-decoration: none; }
 
   /* ── RESPONSIVE ── */
   @media (max-width: 700px) {
-    header, main, footer { padding-left: 24px; padding-right: 24px; }
-    header { grid-template-columns: 1fr; }
-    .header-meta { text-align: left; }
-    .intro { grid-template-columns: 1fr; gap: 32px; }
-    .intro-tags { justify-content: flex-start; }
+    nav { padding: 12px 20px; }
+    .hero-content { padding: 0 24px 48px; }
+    main, .social-section, footer { padding-left: 24px; padding-right: 24px; }
+    .social-context { grid-template-columns: 1fr; gap: 32px; }
+    .reels-grid { grid-template-columns: 1fr; }
     .project { grid-template-columns: 40px 1fr; }
     .project-link { display: none; }
-    .accent-block { grid-template-columns: 1fr; padding: 32px 28px; }
     footer { flex-direction: column; gap: 12px; text-align: center; }
   }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<header>
-  <div>
-    <div class="name">social &amp;<br><em>the web</em></div>
+<!-- NAV -->
+<nav>
+  <span class="nav-name">David Jones</span>
+  <div class="nav-links">
+    <a href="index.html">Résumé</a>
+    <a href="portfolio.html" class="active">Portfolio</a>
   </div>
-  <div class="header-meta">
-    SUNY Canton<br>
-    web / design / writing<br>
-    <a href="https://www.instagram.com/sunycantongram/reels/" target="_blank">@sunycantongram</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <img class="hero-img" src="DSC_0628.webp" alt="David Jones speaking at SUNY Canton">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-name">David<br><em>Jones</em></div>
+    <div class="hero-sub">Digital Communications &amp; Storytelling · SUNY Canton</div>
+    <div class="hero-social">
+      <a href="https://www.instagram.com/sunycantongram/reels/" target="_blank">Instagram ↗</a>
+      <a href="mailto:djop5957@gmail.com">djop5957@gmail.com</a>
+      <a href="index.html">Résumé ↗</a>
+    </div>
+    <div class="scroll-cue">scroll</div>
   </div>
-</header>
+</div>
 
 <!-- MARQUEE -->
 <div class="strip">
@@ -339,91 +437,103 @@
   </div>
 </div>
 
-<!-- MAIN -->
-<main>
+<!-- SOCIAL MEDIA SECTION -->
+<div class="social-section">
 
-  <div class="intro">
-    <div class="intro-text">
-      PR · Content Creation · Web Design · Digital Storytelling
+  <div class="reels-label">social media work — suny canton instagram</div>
+
+  <div class="social-context">
+    <div>
+      <div class="social-stat">8,448</div>
+      <div class="social-stat-label">views on a single reel · school of under 3,000</div>
+      <div class="social-desc">
+        PR Intern at SUNY Canton since January 2026. Producing short-form video content, conducting on-campus interviews, covering events, and analyzing engagement across the college's Instagram account.
+      </div>
+      <div class="social-tags">
+        <span class="social-tag">Adobe Premiere Pro</span>
+        <span class="social-tag">Instagram Reels</span>
+        <span class="social-tag">On-Camera Interviewing</span>
+        <span class="social-tag">Analytics</span>
+        <span class="social-tag">50+ Hours Editing</span>
+      </div>
     </div>
-    <div class="intro-tags">
-      <span class="tag">HTML &amp; CSS</span>
-      <span class="tag">Video Editing</span>
-      <span class="tag">Social Media</span>
-      <span class="tag">2024 – 2026</span>
+    <div style="font-family:'DM Serif Display',serif; font-size:clamp(18px,2vw,24px); font-style:italic; color:#9a9490; line-height:1.5;">
+      "Producing content that reaches more people than attend the school."
     </div>
   </div>
 
-  <div class="section-label">selected projects</div>
+  <div class="reels-label">selected reels</div>
 
+  <div class="reels-grid">
+    <div>
+      <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/reel/DVY239LDldK/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14" style="background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin:0; max-width:100%; min-width:0; padding:0; width:100%;"><div style="padding:16px;"><a href="https://www.instagram.com/reel/DVY239LDldK/?utm_source=ig_embed&amp;utm_campaign=loading" style="background:#FFFFFF; line-height:0; padding:0 0; text-align:center; text-decoration:none; width:100%;" target="_blank"><div style="display:flex; flex-direction:row; align-items:center;"><div style="background-color:#F4F4F4; border-radius:50%; flex-grow:0; height:40px; margin-right:14px; width:40px;"></div><div style="display:flex; flex-direction:column; flex-grow:1; justify-content:center;"><div style="background-color:#F4F4F4; border-radius:4px; flex-grow:0; height:14px; margin-bottom:6px; width:100px;"></div><div style="background-color:#F4F4F4; border-radius:4px; flex-grow:0; height:14px; width:60px;"></div></div></div><div style="padding:19% 0;"></div><div style="display:block; height:50px; margin:0 auto 12px; width:50px;"><svg width="50px" height="50px" viewBox="0 0 60 60" version="1.1" xmlns="https://www.w3.org/2000/svg"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><g transform="translate(-511.000000, -20.000000)" fill="#000000"><g><path d="M556.869,30.41 C554.814,30.41 553.148,32.076 553.148,34.131 C553.148,36.186 554.814,37.852 556.869,37.852 C558.924,37.852 560.59,36.186 560.59,34.131 C560.59,32.076 558.924,30.41 556.869,30.41 M541,60.657 C535.114,60.657 530.342,55.887 530.342,50 C530.342,44.114 535.114,39.342 541,39.342 C546.887,39.342 551.658,44.114 551.658,50 C551.658,55.887 546.887,60.657 541,60.657 M541,33.886 C532.1,33.886 524.886,41.1 524.886,50 C524.886,58.899 532.1,66.113 541,66.113 C549.9,66.113 557.115,58.899 557.115,50 C557.115,41.1 549.9,33.886 541,33.886 M565.378,62.101 C565.244,65.022 564.756,66.606 564.346,67.663 C563.803,69.06 563.154,70.057 562.106,71.106 C561.058,72.155 560.06,72.803 558.662,73.347 C557.607,73.757 556.021,74.244 553.102,74.378 C549.944,74.521 548.997,74.552 541,74.552 C533.003,74.552 532.056,74.521 528.898,74.378 C525.979,74.244 524.393,73.757 523.338,73.347 C521.94,72.803 520.942,72.155 519.894,71.106 C518.846,70.057 518.197,69.06 517.654,67.663 C517.244,66.606 516.755,65.022 516.623,62.101 C516.479,58.943 516.448,57.996 516.448,50 C516.448,42.003 516.479,41.056 516.623,37.899 C516.755,34.978 517.244,33.391 517.654,32.338 C518.197,30.938 518.846,29.942 519.894,28.894 C520.942,27.846 521.94,27.196 523.338,26.654 C524.393,26.244 525.979,25.756 528.898,25.623 C532.057,25.479 533.004,25.448 541,25.448 C548.997,25.448 549.943,25.479 553.102,25.623 C556.021,25.756 557.607,26.244 558.662,26.654 C560.06,27.196 561.058,27.846 562.106,28.894 C563.154,29.942 563.803,30.938 564.346,32.338 C564.756,33.391 565.244,34.978 565.378,37.899 C565.522,41.056 565.552,42.003 565.552,50 C565.552,57.996 565.522,58.943 565.378,62.101 M570.82,37.631 C570.674,34.438 570.167,32.258 569.425,30.349 C568.659,28.377 567.633,26.702 565.965,25.035 C564.297,23.368 562.623,22.342 560.652,21.575 C558.743,20.834 556.562,20.326 553.369,20.18 C550.169,20.033 549.148,20 541,20 C532.853,20 531.831,20.033 528.631,20.18 C525.438,20.326 523.257,20.834 521.349,21.575 C519.376,22.342 517.703,23.368 516.035,25.035 C514.368,26.702 513.342,28.377 512.574,30.349 C511.834,32.258 511.326,34.438 511.181,37.631 C511.035,40.831 511,41.851 511,50 C511,58.147 511.035,59.17 511.181,62.369 C511.326,65.562 511.834,67.743 512.574,69.651 C513.342,71.625 514.368,73.296 516.035,74.965 C517.703,76.634 519.376,77.658 521.349,78.425 C523.257,79.167 525.438,79.673 528.631,79.82 C531.831,79.965 532.853,80.001 541,80.001 C549.148,80.001 550.169,79.965 553.369,79.82 C556.562,79.673 558.743,79.167 560.652,78.425 C562.623,77.658 564.297,76.634 565.965,74.965 C567.633,73.296 568.659,71.625 569.425,69.651 C570.167,67.743 570.674,65.562 570.82,62.369 C570.966,59.17 571,58.147 571,50 C571,41.851 570.966,40.831 570.82,37.631"></path></g></g></g></svg></div><div style="padding-top:8px;"><div style="color:#3897f0; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:550; line-height:18px;">View this post on Instagram</div></div><div style="padding:12.5% 0;"></div><p style="color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;"><a href="https://www.instagram.com/reel/DVY239LDldK/?utm_source=ig_embed&amp;utm_campaign=loading" style="color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none;" target="_blank">A post shared by SUNY Canton (@sunycantongram)</a></p></div></blockquote>
+    </div>
+    <div>
+      <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/reel/DVtlhBnDaOp/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14" style="background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin:0; max-width:100%; min-width:0; padding:0; width:100%;"><div style="padding:16px;"><a href="https://www.instagram.com/reel/DVtlhBnDaOp/?utm_source=ig_embed&amp;utm_campaign=loading" style="background:#FFFFFF; line-height:0; padding:0 0; text-align:center; text-decoration:none; width:100%;" target="_blank"><div style="display:flex; flex-direction:row; align-items:center;"><div style="background-color:#F4F4F4; border-radius:50%; flex-grow:0; height:40px; margin-right:14px; width:40px;"></div><div style="display:flex; flex-direction:column; flex-grow:1; justify-content:center;"><div style="background-color:#F4F4F4; border-radius:4px; flex-grow:0; height:14px; margin-bottom:6px; width:100px;"></div><div style="background-color:#F4F4F4; border-radius:4px; flex-grow:0; height:14px; width:60px;"></div></div></div><div style="padding:19% 0;"></div><div style="display:block; height:50px; margin:0 auto 12px; width:50px;"><svg width="50px" height="50px" viewBox="0 0 60 60" version="1.1" xmlns="https://www.w3.org/2000/svg"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><g transform="translate(-511.000000, -20.000000)" fill="#000000"><g><path d="M556.869,30.41 C554.814,30.41 553.148,32.076 553.148,34.131 C553.148,36.186 554.814,37.852 556.869,37.852 C558.924,37.852 560.59,36.186 560.59,34.131 C560.59,32.076 558.924,30.41 556.869,30.41 M541,60.657 C535.114,60.657 530.342,55.887 530.342,50 C530.342,44.114 535.114,39.342 541,39.342 C546.887,39.342 551.658,44.114 551.658,50 C551.658,55.887 546.887,60.657 541,60.657 M541,33.886 C532.1,33.886 524.886,41.1 524.886,50 C524.886,58.899 532.1,66.113 541,66.113 C549.9,66.113 557.115,58.899 557.115,50 C557.115,41.1 549.9,33.886 541,33.886 M565.378,62.101 C565.244,65.022 564.756,66.606 564.346,67.663 C563.803,69.06 563.154,70.057 562.106,71.106 C561.058,72.155 560.06,72.803 558.662,73.347 C557.607,73.757 556.021,74.244 553.102,74.378 C549.944,74.521 548.997,74.552 541,74.552 C533.003,74.552 532.056,74.521 528.898,74.378 C525.979,74.244 524.393,73.757 523.338,73.347 C521.94,72.803 520.942,72.155 519.894,71.106 C518.846,70.057 518.197,69.06 517.654,67.663 C517.244,66.606 516.755,65.022 516.623,62.101 C516.479,58.943 516.448,57.996 516.448,50 C516.448,42.003 516.479,41.056 516.623,37.899 C516.755,34.978 517.244,33.391 517.654,32.338 C518.197,30.938 518.846,29.942 519.894,28.894 C520.942,27.846 521.94,27.196 523.338,26.654 C524.393,26.244 525.979,25.756 528.898,25.623 C532.057,25.479 533.004,25.448 541,25.448 C548.997,25.448 549.943,25.479 553.102,25.623 C556.021,25.756 557.607,26.244 558.662,26.654 C560.06,27.196 561.058,27.846 562.106,28.894 C563.154,29.942 563.803,30.938 564.346,32.338 C564.756,33.391 565.244,34.978 565.378,37.899 C565.522,41.056 565.552,42.003 565.552,50 C565.552,57.996 565.522,58.943 565.378,62.101 M570.82,37.631 C570.674,34.438 570.167,32.258 569.425,30.349 C568.659,28.377 567.633,26.702 565.965,25.035 C564.297,23.368 562.623,22.342 560.652,21.575 C558.743,20.834 556.562,20.326 553.369,20.18 C550.169,20.033 549.148,20 541,20 C532.853,20 531.831,20.033 528.631,20.18 C525.438,20.326 523.257,20.834 521.349,21.575 C519.376,22.342 517.703,23.368 516.035,25.035 C514.368,26.702 513.342,28.377 512.574,30.349 C511.834,32.258 511.326,34.438 511.181,37.631 C511.035,40.831 511,41.851 511,50 C511,58.147 511.035,59.17 511.181,62.369 C511.326,65.562 511.834,67.743 512.574,69.651 C513.342,71.625 514.368,73.296 516.035,74.965 C517.703,76.634 519.376,77.658 521.349,78.425 C523.257,79.167 525.438,79.673 528.631,79.82 C531.831,79.965 532.853,80.001 541,80.001 C549.148,80.001 550.169,79.965 553.369,79.82 C556.562,79.673 558.743,79.167 560.652,78.425 C562.623,77.658 564.297,76.634 565.965,74.965 C567.633,73.296 568.659,71.625 569.425,69.651 C570.167,67.743 570.674,65.562 570.82,62.369 C570.966,59.17 571,58.147 571,50 C571,41.851 570.966,40.831 570.82,37.631"></path></g></g></g></svg></div><div style="padding-top:8px;"><div style="color:#3897f0; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:550; line-height:18px;">View this post on Instagram</div></div><div style="padding:12.5% 0;"></div><p style="color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;"><a href="https://www.instagram.com/reel/DVtlhBnDaOp/?utm_source=ig_embed&amp;utm_campaign=loading" style="color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none;" target="_blank">A post shared by SUNY Canton (@sunycantongram)</a></p></div></blockquote>
+    </div>
+    <div>
+      <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/reel/DW42sRYGEjC/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14" style="background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin:0; max-width:100%; min-width:0; padding:0; width:100%;"><div style="padding:16px;"><a href="https://www.instagram.com/reel/DW42sRYGEjC/?utm_source=ig_embed&amp;utm_campaign=loading" style="background:#FFFFFF; line-height:0; padding:0 0; text-align:center; text-decoration:none; width:100%;" target="_blank"><div style="display:flex; flex-direction:row; align-items:center;"><div style="background-color:#F4F4F4; border-radius:50%; flex-grow:0; height:40px; margin-right:14px; width:40px;"></div><div style="display:flex; flex-direction:column; flex-grow:1; justify-content:center;"><div style="background-color:#F4F4F4; border-radius:4px; flex-grow:0; height:14px; margin-bottom:6px; width:100px;"></div><div style="background-color:#F4F4F4; border-radius:4px; flex-grow:0; height:14px; width:60px;"></div></div></div><div style="padding:19% 0;"></div><div style="display:block; height:50px; margin:0 auto 12px; width:50px;"><svg width="50px" height="50px" viewBox="0 0 60 60" version="1.1" xmlns="https://www.w3.org/2000/svg"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><g transform="translate(-511.000000, -20.000000)" fill="#000000"><g><path d="M556.869,30.41 C554.814,30.41 553.148,32.076 553.148,34.131 C553.148,36.186 554.814,37.852 556.869,37.852 C558.924,37.852 560.59,36.186 560.59,34.131 C560.59,32.076 558.924,30.41 556.869,30.41 M541,60.657 C535.114,60.657 530.342,55.887 530.342,50 C530.342,44.114 535.114,39.342 541,39.342 C546.887,39.342 551.658,44.114 551.658,50 C551.658,55.887 546.887,60.657 541,60.657 M541,33.886 C532.1,33.886 524.886,41.1 524.886,50 C524.886,58.899 532.1,66.113 541,66.113 C549.9,66.113 557.115,58.899 557.115,50 C557.115,41.1 549.9,33.886 541,33.886 M565.378,62.101 C565.244,65.022 564.756,66.606 564.346,67.663 C563.803,69.06 563.154,70.057 562.106,71.106 C561.058,72.155 560.06,72.803 558.662,73.347 C557.607,73.757 556.021,74.244 553.102,74.378 C549.944,74.521 548.997,74.552 541,74.552 C533.003,74.552 532.056,74.521 528.898,74.378 C525.979,74.244 524.393,73.757 523.338,73.347 C521.94,72.803 520.942,72.155 519.894,71.106 C518.846,70.057 518.197,69.06 517.654,67.663 C517.244,66.606 516.755,65.022 516.623,62.101 C516.479,58.943 516.448,57.996 516.448,50 C516.448,42.003 516.479,41.056 516.623,37.899 C516.755,34.978 517.244,33.391 517.654,32.338 C518.197,30.938 518.846,29.942 519.894,28.894 C520.942,27.846 521.94,27.196 523.338,26.654 C524.393,26.244 525.979,25.756 528.898,25.623 C532.057,25.479 533.004,25.448 541,25.448 C548.997,25.448 549.943,25.479 553.102,25.623 C556.021,25.756 557.607,26.244 558.662,26.654 C560.06,27.196 561.058,27.846 562.106,28.894 C563.154,29.942 563.803,30.938 564.346,32.338 C564.756,33.391 565.244,34.978 565.378,37.899 C565.522,41.056 565.552,42.003 565.552,50 C565.552,57.996 565.522,58.943 565.378,62.101 M570.82,37.631 C570.674,34.438 570.167,32.258 569.425,30.349 C568.659,28.377 567.633,26.702 565.965,25.035 C564.297,23.368 562.623,22.342 560.652,21.575 C558.743,20.834 556.562,20.326 553.369,20.18 C550.169,20.033 549.148,20 541,20 C532.853,20 531.831,20.033 528.631,20.18 C525.438,20.326 523.257,20.834 521.349,21.575 C519.376,22.342 517.703,23.368 516.035,25.035 C514.368,26.702 513.342,28.377 512.574,30.349 C511.834,32.258 511.326,34.438 511.181,37.631 C511.035,40.831 511,41.851 511,50 C511,58.147 511.035,59.17 511.181,62.369 C511.326,65.562 511.834,67.743 512.574,69.651 C513.342,71.625 514.368,73.296 516.035,74.965 C517.703,76.634 519.376,77.658 521.349,78.425 C523.257,79.167 525.438,79.673 528.631,79.82 C531.831,79.965 532.853,80.001 541,80.001 C549.148,80.001 550.169,79.965 553.369,79.82 C556.562,79.673 558.743,79.167 560.652,78.425 C562.623,77.658 564.297,76.634 565.965,74.965 C567.633,73.296 568.659,71.625 569.425,69.651 C570.167,67.743 570.674,65.562 570.82,62.369 C570.966,59.17 571,58.147 571,50 C571,41.851 570.966,40.831 570.82,37.631"></path></g></g></g></svg></div><div style="padding-top:8px;"><div style="color:#3897f0; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:550; line-height:18px;">View this post on Instagram</div></div><div style="padding:12.5% 0;"></div><p style="color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;"><a href="https://www.instagram.com/reel/DW42sRYGEjC/?utm_source=ig_embed&amp;utm_campaign=loading" style="color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none;" target="_blank">A post shared by SUNY Canton (@sunycantongram)</a></p></div></blockquote>
+    </div>
+  </div>
+  <script async src="//www.instagram.com/embed.js"></script>
+
+</div>
+
+<!-- WEB PROJECTS -->
+<main>
+  <div class="section-label">web projects</div>
   <div class="projects">
 
-    <!-- PROJECT 1 -->
     <div class="project">
       <div class="project-num">01</div>
       <div class="project-body">
         <div class="project-title"><em>briar</em>.mp3</div>
-        <div class="project-desc">
-          An audio index built for a presentation called "Don't Fall Asleep." Each slide gets its own lo-fi track — the page pairs ambient music with chapter titles using a dark terminal aesthetic and custom-filtered audio controls.
-        </div>
+        <div class="project-desc">An audio index built for a presentation called "Don't Fall Asleep." Each slide gets its own lo-fi track — the page pairs ambient music with chapter titles using a dark terminal aesthetic and custom-filtered audio controls.</div>
         <div class="project-stack">
           <span class="stack-item">HTML / CSS</span>
           <span class="stack-item">Web Audio</span>
-          <span class="stack-item">Share Tech Mono</span>
           <span class="stack-item">Lo-fi / Ambient</span>
         </div>
       </div>
-      <a class="project-link" href="index.html">open →</a>
+      <a class="project-link" href="dont-fall-asleep.html">open →</a>
     </div>
 
-    <!-- PROJECT 2 -->
     <div class="project">
       <div class="project-num">02</div>
       <div class="project-body">
         <div class="project-title">TYPIS: <em>Prologue</em></div>
-        <div class="project-desc">
-          A full design document for an original game — built as a living webpage. Deep ocean color palette, animated floating particles, a rotating water wheel, Cinzel display type, and scroll-driven sections lay out the world, mechanics, and lore of the prologue.
-        </div>
+        <div class="project-desc">A full design document for an original game — built as a living webpage. Deep ocean color palette, animated floating particles, a rotating water wheel, Cinzel display type, and scroll-driven sections lay out the world, mechanics, and lore of the prologue.</div>
         <div class="project-stack">
           <span class="stack-item">HTML / CSS / JS</span>
           <span class="stack-item">CSS Animation</span>
-          <span class="stack-item">Cinzel + Crimson Pro</span>
           <span class="stack-item">Game Design</span>
         </div>
       </div>
       <a class="project-link" href="typis.html">open →</a>
     </div>
 
-    <!-- PROJECT 3 -->
     <div class="project">
       <div class="project-num">03</div>
       <div class="project-body">
         <div class="project-title">Moby Dick — <em>Whaleboat</em></div>
-        <div class="project-desc">
-          A final project exploring the whaleboat and osteological plates in Melville's Moby Dick. Research and visual design combined into a single page — a web-based academic presentation with a nautical theme.
-        </div>
+        <div class="project-desc">A final project exploring the whaleboat and osteological plates in Melville's Moby Dick. Research and visual design combined into a single page — a web-based academic presentation with a nautical theme.</div>
         <div class="project-stack">
           <span class="stack-item">HTML / CSS</span>
           <span class="stack-item">Research / Writing</span>
-          <span class="stack-item">Nautical Theme</span>
           <span class="stack-item">Academic</span>
         </div>
       </div>
       <a class="project-link" href="Moby_Dick_Final_Project.html">open →</a>
     </div>
 
-    <!-- PROJECT 4 -->
     <div class="project">
       <div class="project-num">04</div>
       <div class="project-body">
         <div class="project-title">Alteria — <em>Group Narrative</em></div>
-        <div class="project-desc">
-          A collaborative game narrative project built with a full workgroup. The site served as the team's central hub, featuring an interactive chapter map where users click through story scenes to follow the narrative flow.
-        </div>
+        <div class="project-desc">A collaborative game narrative project built with a full workgroup. The site served as the team's central hub, featuring an interactive chapter map where users click through story scenes to follow the narrative flow.</div>
         <div class="project-stack">
           <span class="stack-item">HTML / CSS</span>
           <span class="stack-item">Narrative Design</span>
-          <span class="stack-item">Interactive Map</span>
           <span class="stack-item">Collaborative</span>
         </div>
       </div>
@@ -431,67 +541,12 @@
     </div>
 
   </div>
-
 </main>
-
-<!-- SOCIAL MEDIA SECTION -->
-<section style="background: var(--ink); color: var(--paper); padding: 64px 60px 72px;">
-
-  <!-- Section header -->
-  <div style="display:flex; align-items:center; gap:16px; margin-bottom:48px;">
-    <span style="font-size:9px; letter-spacing:0.35em; text-transform:uppercase; color:#9a9490;">social media work</span>
-    <div style="flex:1; height:1px; background:#2a2a2a;"></div>
-  </div>
-
-  <!-- Photo + context -->
-  <div style="display:grid; grid-template-columns:1fr 1fr; gap:52px; align-items:center; margin-bottom:64px;">
-    <div>
-      <img src="David Jones Speech Picture.JPG" alt="David Jones speaking at SUNY Canton"
-        style="width:100%; display:block; filter:grayscale(20%) contrast(1.05);">
-    </div>
-    <div>
-      <div style="font-family:'DM Serif Display',serif; font-size:clamp(20px,2.5vw,30px); font-style:italic; line-height:1.3; margin-bottom:20px;">
-        PR Intern — <em style="color:var(--accent); font-style:normal;">SUNY Canton</em>
-      </div>
-      <div style="font-size:12px; color:#9a9490; line-height:1.9; margin-bottom:24px;">
-        Producing short-form video content for SUNY Canton's Instagram since January 2026.
-        One reel reached <span style="color:var(--paper); font-weight:600;">8,448 views</span> at a school of under 3,000 students.
-        Work includes on-campus interviews, event coverage, and social media analytics.
-      </div>
-      <div style="display:flex; gap:16px; flex-wrap:wrap;">
-        <span style="font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:#9a9490;">— Adobe Premiere Pro</span>
-        <span style="font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:#9a9490;">— Instagram Reels</span>
-        <span style="font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:#9a9490;">— On-Camera Interviewing</span>
-        <span style="font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:#9a9490;">— Analytics</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Reels grid -->
-  <div style="font-size:9px; letter-spacing:0.35em; text-transform:uppercase; color:#9a9490; margin-bottom:28px;">selected reels</div>
-  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:24px; align-items:start;">
-
-    <div>
-      <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/reel/DVY239LDldK/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14" style="background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin:0; max-width:100%; min-width:0; padding:0; width:100%;"><div style="padding:16px;"><a href="https://www.instagram.com/reel/DVY239LDldK/?utm_source=ig_embed&amp;utm_campaign=loading" style="background:#FFFFFF; line-height:0; padding:0 0; text-align:center; text-decoration:none; width:100%;" target="_blank"><div style="display:flex; flex-direction:row; align-items:center;"><div style="background-color:#F4F4F4; border-radius:50%; flex-grow:0; height:40px; margin-right:14px; width:40px;"></div><div style="display:flex; flex-direction:column; flex-grow:1; justify-content:center;"><div style="background-color:#F4F4F4; border-radius:4px; flex-grow:0; height:14px; margin-bottom:6px; width:100px;"></div><div style="background-color:#F4F4F4; border-radius:4px; flex-grow:0; height:14px; width:60px;"></div></div></div><div style="padding:19% 0;"></div><div style="display:block; height:50px; margin:0 auto 12px; width:50px;"><svg width="50px" height="50px" viewBox="0 0 60 60" version="1.1" xmlns="https://www.w3.org/2000/svg"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><g transform="translate(-511.000000, -20.000000)" fill="#000000"><g><path d="M556.869,30.41 C554.814,30.41 553.148,32.076 553.148,34.131 C553.148,36.186 554.814,37.852 556.869,37.852 C558.924,37.852 560.59,36.186 560.59,34.131 C560.59,32.076 558.924,30.41 556.869,30.41 M541,60.657 C535.114,60.657 530.342,55.887 530.342,50 C530.342,44.114 535.114,39.342 541,39.342 C546.887,39.342 551.658,44.114 551.658,50 C551.658,55.887 546.887,60.657 541,60.657 M541,33.886 C532.1,33.886 524.886,41.1 524.886,50 C524.886,58.899 532.1,66.113 541,66.113 C549.9,66.113 557.115,58.899 557.115,50 C557.115,41.1 549.9,33.886 541,33.886 M565.378,62.101 C565.244,65.022 564.756,66.606 564.346,67.663 C563.803,69.06 563.154,70.057 562.106,71.106 C561.058,72.155 560.06,72.803 558.662,73.347 C557.607,73.757 556.021,74.244 553.102,74.378 C549.944,74.521 548.997,74.552 541,74.552 C533.003,74.552 532.056,74.521 528.898,74.378 C525.979,74.244 524.393,73.757 523.338,73.347 C521.94,72.803 520.942,72.155 519.894,71.106 C518.846,70.057 518.197,69.06 517.654,67.663 C517.244,66.606 516.755,65.022 516.623,62.101 C516.479,58.943 516.448,57.996 516.448,50 C516.448,42.003 516.479,41.056 516.623,37.899 C516.755,34.978 517.244,33.391 517.654,32.338 C518.197,30.938 518.846,29.942 519.894,28.894 C520.942,27.846 521.94,27.196 523.338,26.654 C524.393,26.244 525.979,25.756 528.898,25.623 C532.057,25.479 533.004,25.448 541,25.448 C548.997,25.448 549.943,25.479 553.102,25.623 C556.021,25.756 557.607,26.244 558.662,26.654 C560.06,27.196 561.058,27.846 562.106,28.894 C563.154,29.942 563.803,30.938 564.346,32.338 C564.756,33.391 565.244,34.978 565.378,37.899 C565.522,41.056 565.552,42.003 565.552,50 C565.552,57.996 565.522,58.943 565.378,62.101 M570.82,37.631 C570.674,34.438 570.167,32.258 569.425,30.349 C568.659,28.377 567.633,26.702 565.965,25.035 C564.297,23.368 562.623,22.342 560.652,21.575 C558.743,20.834 556.562,20.326 553.369,20.18 C550.169,20.033 549.148,20 541,20 C532.853,20 531.831,20.033 528.631,20.18 C525.438,20.326 523.257,20.834 521.349,21.575 C519.376,22.342 517.703,23.368 516.035,25.035 C514.368,26.702 513.342,28.377 512.574,30.349 C511.834,32.258 511.326,34.438 511.181,37.631 C511.035,40.831 511,41.851 511,50 C511,58.147 511.035,59.17 511.181,62.369 C511.326,65.562 511.834,67.743 512.574,69.651 C513.342,71.625 514.368,73.296 516.035,74.965 C517.703,76.634 519.376,77.658 521.349,78.425 C523.257,79.167 525.438,79.673 528.631,79.82 C531.831,79.965 532.853,80.001 541,80.001 C549.148,80.001 550.169,79.965 553.369,79.82 C556.562,79.673 558.743,79.167 560.652,78.425 C562.623,77.658 564.297,76.634 565.965,74.965 C567.633,73.296 568.659,71.625 569.425,69.651 C570.167,67.743 570.674,65.562 570.82,62.369 C570.966,59.17 571,58.147 571,50 C571,41.851 570.966,40.831 570.82,37.631"></path></g></g></g></svg></div><div style="padding-top:8px;"><div style="color:#3897f0; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:550; line-height:18px;">View this post on Instagram</div></div><div style="padding:12.5% 0;"></div><p style="color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;"><a href="https://www.instagram.com/reel/DVY239LDldK/?utm_source=ig_embed&amp;utm_campaign=loading" style="color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none;" target="_blank">A post shared by SUNY Canton (@sunycantongram)</a></p></div></blockquote>
-    </div>
-
-    <div>
-      <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/reel/DVtlhBnDaOp/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14" style="background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin:0; max-width:100%; min-width:0; padding:0; width:100%;"><div style="padding:16px;"><a href="https://www.instagram.com/reel/DVtlhBnDaOp/?utm_source=ig_embed&amp;utm_campaign=loading" style="background:#FFFFFF; line-height:0; padding:0 0; text-align:center; text-decoration:none; width:100%;" target="_blank"><div style="display:flex; flex-direction:row; align-items:center;"><div style="background-color:#F4F4F4; border-radius:50%; flex-grow:0; height:40px; margin-right:14px; width:40px;"></div><div style="display:flex; flex-direction:column; flex-grow:1; justify-content:center;"><div style="background-color:#F4F4F4; border-radius:4px; flex-grow:0; height:14px; margin-bottom:6px; width:100px;"></div><div style="background-color:#F4F4F4; border-radius:4px; flex-grow:0; height:14px; width:60px;"></div></div></div><div style="padding:19% 0;"></div><div style="display:block; height:50px; margin:0 auto 12px; width:50px;"><svg width="50px" height="50px" viewBox="0 0 60 60" version="1.1" xmlns="https://www.w3.org/2000/svg"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><g transform="translate(-511.000000, -20.000000)" fill="#000000"><g><path d="M556.869,30.41 C554.814,30.41 553.148,32.076 553.148,34.131 C553.148,36.186 554.814,37.852 556.869,37.852 C558.924,37.852 560.59,36.186 560.59,34.131 C560.59,32.076 558.924,30.41 556.869,30.41 M541,60.657 C535.114,60.657 530.342,55.887 530.342,50 C530.342,44.114 535.114,39.342 541,39.342 C546.887,39.342 551.658,44.114 551.658,50 C551.658,55.887 546.887,60.657 541,60.657 M541,33.886 C532.1,33.886 524.886,41.1 524.886,50 C524.886,58.899 532.1,66.113 541,66.113 C549.9,66.113 557.115,58.899 557.115,50 C557.115,41.1 549.9,33.886 541,33.886 M565.378,62.101 C565.244,65.022 564.756,66.606 564.346,67.663 C563.803,69.06 563.154,70.057 562.106,71.106 C561.058,72.155 560.06,72.803 558.662,73.347 C557.607,73.757 556.021,74.244 553.102,74.378 C549.944,74.521 548.997,74.552 541,74.552 C533.003,74.552 532.056,74.521 528.898,74.378 C525.979,74.244 524.393,73.757 523.338,73.347 C521.94,72.803 520.942,72.155 519.894,71.106 C518.846,70.057 518.197,69.06 517.654,67.663 C517.244,66.606 516.755,65.022 516.623,62.101 C516.479,58.943 516.448,57.996 516.448,50 C516.448,42.003 516.479,41.056 516.623,37.899 C516.755,34.978 517.244,33.391 517.654,32.338 C518.197,30.938 518.846,29.942 519.894,28.894 C520.942,27.846 521.94,27.196 523.338,26.654 C524.393,26.244 525.979,25.756 528.898,25.623 C532.057,25.479 533.004,25.448 541,25.448 C548.997,25.448 549.943,25.479 553.102,25.623 C556.021,25.756 557.607,26.244 558.662,26.654 C560.06,27.196 561.058,27.846 562.106,28.894 C563.154,29.942 563.803,30.938 564.346,32.338 C564.756,33.391 565.244,34.978 565.378,37.899 C565.522,41.056 565.552,42.003 565.552,50 C565.552,57.996 565.522,58.943 565.378,62.101 M570.82,37.631 C570.674,34.438 570.167,32.258 569.425,30.349 C568.659,28.377 567.633,26.702 565.965,25.035 C564.297,23.368 562.623,22.342 560.652,21.575 C558.743,20.834 556.562,20.326 553.369,20.18 C550.169,20.033 549.148,20 541,20 C532.853,20 531.831,20.033 528.631,20.18 C525.438,20.326 523.257,20.834 521.349,21.575 C519.376,22.342 517.703,23.368 516.035,25.035 C514.368,26.702 513.342,28.377 512.574,30.349 C511.834,32.258 511.326,34.438 511.181,37.631 C511.035,40.831 511,41.851 511,50 C511,58.147 511.035,59.17 511.181,62.369 C511.326,65.562 511.834,67.743 512.574,69.651 C513.342,71.625 514.368,73.296 516.035,74.965 C517.703,76.634 519.376,77.658 521.349,78.425 C523.257,79.167 525.438,79.673 528.631,79.82 C531.831,79.965 532.853,80.001 541,80.001 C549.148,80.001 550.169,79.965 553.369,79.82 C556.562,79.673 558.743,79.167 560.652,78.425 C562.623,77.658 564.297,76.634 565.965,74.965 C567.633,73.296 568.659,71.625 569.425,69.651 C570.167,67.743 570.674,65.562 570.82,62.369 C570.966,59.17 571,58.147 571,50 C571,41.851 570.966,40.831 570.82,37.631"></path></g></g></g></svg></div><div style="padding-top:8px;"><div style="color:#3897f0; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:550; line-height:18px;">View this post on Instagram</div></div><div style="padding:12.5% 0;"></div><p style="color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;"><a href="https://www.instagram.com/reel/DVtlhBnDaOp/?utm_source=ig_embed&amp;utm_campaign=loading" style="color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none;" target="_blank">A post shared by SUNY Canton (@sunycantongram)</a></p></div></blockquote>
-    </div>
-
-    <div>
-      <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/reel/DW42sRYGEjC/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14" style="background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin:0; max-width:100%; min-width:0; padding:0; width:100%;"><div style="padding:16px;"><a href="https://www.instagram.com/reel/DW42sRYGEjC/?utm_source=ig_embed&amp;utm_campaign=loading" style="background:#FFFFFF; line-height:0; padding:0 0; text-align:center; text-decoration:none; width:100%;" target="_blank"><div style="display:flex; flex-direction:row; align-items:center;"><div style="background-color:#F4F4F4; border-radius:50%; flex-grow:0; height:40px; margin-right:14px; width:40px;"></div><div style="display:flex; flex-direction:column; flex-grow:1; justify-content:center;"><div style="background-color:#F4F4F4; border-radius:4px; flex-grow:0; height:14px; margin-bottom:6px; width:100px;"></div><div style="background-color:#F4F4F4; border-radius:4px; flex-grow:0; height:14px; width:60px;"></div></div></div><div style="padding:19% 0;"></div><div style="display:block; height:50px; margin:0 auto 12px; width:50px;"><svg width="50px" height="50px" viewBox="0 0 60 60" version="1.1" xmlns="https://www.w3.org/2000/svg"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><g transform="translate(-511.000000, -20.000000)" fill="#000000"><g><path d="M556.869,30.41 C554.814,30.41 553.148,32.076 553.148,34.131 C553.148,36.186 554.814,37.852 556.869,37.852 C558.924,37.852 560.59,36.186 560.59,34.131 C560.59,32.076 558.924,30.41 556.869,30.41 M541,60.657 C535.114,60.657 530.342,55.887 530.342,50 C530.342,44.114 535.114,39.342 541,39.342 C546.887,39.342 551.658,44.114 551.658,50 C551.658,55.887 546.887,60.657 541,60.657 M541,33.886 C532.1,33.886 524.886,41.1 524.886,50 C524.886,58.899 532.1,66.113 541,66.113 C549.9,66.113 557.115,58.899 557.115,50 C557.115,41.1 549.9,33.886 541,33.886 M565.378,62.101 C565.244,65.022 564.756,66.606 564.346,67.663 C563.803,69.06 563.154,70.057 562.106,71.106 C561.058,72.155 560.06,72.803 558.662,73.347 C557.607,73.757 556.021,74.244 553.102,74.378 C549.944,74.521 548.997,74.552 541,74.552 C533.003,74.552 532.056,74.521 528.898,74.378 C525.979,74.244 524.393,73.757 523.338,73.347 C521.94,72.803 520.942,72.155 519.894,71.106 C518.846,70.057 518.197,69.06 517.654,67.663 C517.244,66.606 516.755,65.022 516.623,62.101 C516.479,58.943 516.448,57.996 516.448,50 C516.448,42.003 516.479,41.056 516.623,37.899 C516.755,34.978 517.244,33.391 517.654,32.338 C518.197,30.938 518.846,29.942 519.894,28.894 C520.942,27.846 521.94,27.196 523.338,26.654 C524.393,26.244 525.979,25.756 528.898,25.623 C532.057,25.479 533.004,25.448 541,25.448 C548.997,25.448 549.943,25.479 553.102,25.623 C556.021,25.756 557.607,26.244 558.662,26.654 C560.06,27.196 561.058,27.846 562.106,28.894 C563.154,29.942 563.803,30.938 564.346,32.338 C564.756,33.391 565.244,34.978 565.378,37.899 C565.522,41.056 565.552,42.003 565.552,50 C565.552,57.996 565.522,58.943 565.378,62.101 M570.82,37.631 C570.674,34.438 570.167,32.258 569.425,30.349 C568.659,28.377 567.633,26.702 565.965,25.035 C564.297,23.368 562.623,22.342 560.652,21.575 C558.743,20.834 556.562,20.326 553.369,20.18 C550.169,20.033 549.148,20 541,20 C532.853,20 531.831,20.033 528.631,20.18 C525.438,20.326 523.257,20.834 521.349,21.575 C519.376,22.342 517.703,23.368 516.035,25.035 C514.368,26.702 513.342,28.377 512.574,30.349 C511.834,32.258 511.326,34.438 511.181,37.631 C511.035,40.831 511,41.851 511,50 C511,58.147 511.035,59.17 511.181,62.369 C511.326,65.562 511.834,67.743 512.574,69.651 C513.342,71.625 514.368,73.296 516.035,74.965 C517.703,76.634 519.376,77.658 521.349,78.425 C523.257,79.167 525.438,79.673 528.631,79.82 C531.831,79.965 532.853,80.001 541,80.001 C549.148,80.001 550.169,79.965 553.369,79.82 C556.562,79.673 558.743,79.167 560.652,78.425 C562.623,77.658 564.297,76.634 565.965,74.965 C567.633,73.296 568.659,71.625 569.425,69.651 C570.167,67.743 570.674,65.562 570.82,62.369 C570.966,59.17 571,58.147 571,50 C571,41.851 570.966,40.831 570.82,37.631"></path></g></g></g></svg></div><div style="padding-top:8px;"><div style="color:#3897f0; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:550; line-height:18px;">View this post on Instagram</div></div><div style="padding:12.5% 0;"></div><p style="color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;"><a href="https://www.instagram.com/reel/DW42sRYGEjC/?utm_source=ig_embed&amp;utm_campaign=loading" style="color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none;" target="_blank">A post shared by SUNY Canton (@sunycantongram)</a></p></div></blockquote>
-    </div>
-
-  </div>
-  <script async src="//www.instagram.com/embed.js"></script>
-
-</section>
 
 <!-- FOOTER -->
 <footer>
-  <span>portfolio — 2026</span>
-  <span>html / css — hand built</span>
+  <span>David Jones</span>
+  <span>djop5957@gmail.com</span>
   <a href="https://www.instagram.com/sunycantongram/reels/" target="_blank">instagram ↗</a>
 </footer>
 
