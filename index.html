@@ -53,6 +53,35 @@
     color: #111;
   }
 
+    /* NAV */
+  nav {
+    background: var(--nav-bg);
+    padding: 14px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-name {
+    font-family: 'EB Garamond', serif;
+    font-size: 15pt;
+    color: var(--nav-text);
+    letter-spacing: 0.5px;
+  }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a {
+    color: #aaa;
+    text-decoration: none;
+    font-size: 9.5pt;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--nav-text); }
+  .nav-links a.active { color: var(--nav-text); }
+
   /* Experience entries */
   .entry { margin-bottom: 13px; }
   .entry-header {
