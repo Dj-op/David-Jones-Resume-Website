@@ -266,6 +266,29 @@
   }
   .social-tag::before { content: '— '; }
 
+  .social-mini-stats {
+    display: flex;
+    gap: 40px;
+    margin-top: 32px;
+    padding-top: 28px;
+    border-top: 1px solid #2a2a2a;
+  }
+
+  .mini-stat-val {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: #f0ebe3;
+    line-height: 1;
+    margin-bottom: 5px;
+  }
+
+  .mini-stat-label {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #9a9490;
+  }
+
   .reels-label {
     font-size: 9px;
     letter-spacing: 0.35em;
@@ -385,6 +408,7 @@
     .project { grid-template-columns: 40px 1fr; }
     .project-link { display: none; }
     footer { flex-direction: column; gap: 12px; text-align: center; }
+    .social-mini-stats { gap: 24px; }
   }
 </style>
 </head>
@@ -409,7 +433,7 @@
     <div class="hero-social">
       <a href="https://www.instagram.com/sunycantongram/reels/" target="_blank">Instagram ↗</a>
       <a href="mailto:djop5957@gmail.com">djop5957@gmail.com</a>
-      <a href="index.">Résumé ↗</a>
+      <a href="index.html">Résumé ↗</a>
     </div>
     <div class="scroll-cue">scroll</div>
   </div>
@@ -444,10 +468,10 @@
 
   <div class="social-context">
     <div>
-      <div class="social-stat">8,448</div>
+      <div class="social-stat">135,000</div>
       <div class="social-stat-label">views on a single reel · school of under 3,000</div>
       <div class="social-desc">
-        PR Intern at SUNY Canton since January 2026. Producing short-form video content, conducting on-campus interviews, covering events, and analyzing engagement across the college's Instagram account.
+        PR Intern at SUNY Canton since January 2026. Producing short-form video content, conducting on-campus interviews, covering events, and tracking engagement across the college's Instagram account — an active page with over 5,000 followers and nearly 1,000 posts.
       </div>
       <div class="social-tags">
         <span class="social-tag">Adobe Premiere Pro</span>
@@ -455,6 +479,21 @@
         <span class="social-tag">On-Camera Interviewing</span>
         <span class="social-tag">Analytics</span>
         <span class="social-tag">50+ Hours Editing</span>
+      </div>
+
+      <div class="social-mini-stats">
+        <div>
+          <div class="mini-stat-val">3,000+</div>
+          <div class="mini-stat-label">likes on top reel</div>
+        </div>
+        <div>
+          <div class="mini-stat-val">5,042</div>
+          <div class="mini-stat-label">account followers</div>
+        </div>
+        <div>
+          <div class="mini-stat-val">989</div>
+          <div class="mini-stat-label">posts on account</div>
+        </div>
       </div>
     </div>
     <div style="font-family:'DM Serif Display',serif; font-size:clamp(18px,2vw,24px); font-style:italic; color:#9a9490; line-height:1.5;">
