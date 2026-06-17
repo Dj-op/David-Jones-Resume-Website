@@ -27,7 +27,6 @@
     line-height: 1.55;
   }
 
-  /* NAV */
   nav {
     background: var(--nav-bg);
     padding: 14px 48px;
@@ -56,14 +55,12 @@
   .nav-links a:hover { color: var(--nav-text); }
   .nav-links a.active { color: var(--nav-text); }
 
-  /* PAGE */
   .page {
     max-width: 780px;
     margin: 0 auto;
     padding: 44px 56px 64px;
   }
 
-  /* HEADER */
   .header {
     border-bottom: 2px solid var(--ink);
     padding-bottom: 14px;
@@ -84,7 +81,6 @@
     gap: 4px 20px;
   }
 
-  /* SECTIONS */
   section { margin-bottom: 22px; }
   .section-title {
     font-family: 'EB Garamond', serif;
@@ -98,7 +94,35 @@
     color: var(--ink);
   }
 
-  /* SKILLS */
+  .stat-bar {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--rule);
+    margin-bottom: 20px;
+    margin-top: -4px;
+  }
+  .stat-cell {
+    flex: 1;
+    padding: 10px 16px;
+    border-right: 1px solid var(--rule);
+    text-align: center;
+  }
+  .stat-cell:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'EB Garamond', serif;
+    font-size: 17pt;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .stat-lbl {
+    font-size: 7.5pt;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--light);
+    margin-top: 3px;
+  }
+
   .skills-group { margin-bottom: 10px; }
   .skills-label {
     font-size: 9pt;
@@ -117,7 +141,6 @@
   .skill-tag::after { content: '·'; margin-left: 16px; color: var(--rule); }
   .skill-tag:last-child::after { content: ''; }
 
-  /* EXPERIENCE */
   .entry { margin-bottom: 15px; }
   .entry-header {
     display: flex;
@@ -138,13 +161,11 @@
   ul { padding-left: 16px; margin-top: 4px; }
   li { margin-bottom: 3px; font-size: 10pt; color: #222; }
 
-  /* EDUCATION */
   .edu-entry { margin-bottom: 12px; }
   .edu-school { font-weight: 600; font-size: 10.5pt; }
   .edu-degree { font-style: italic; font-size: 10pt; color: #333; margin: 2px 0; }
   .edu-details { font-size: 9.5pt; color: var(--mid); }
 
-  /* PROJECTS */
   .project-entry { margin-bottom: 10px; }
   .project-title { font-weight: 600; font-size: 10.5pt; }
   .project-sub { font-size: 9.5pt; color: var(--mid); font-style: italic; }
@@ -174,11 +195,16 @@
     .org { margin-bottom: 2px; }
     ul { margin-top: 2px; }
     .skills-group { margin-bottom: 5px; }
-    .entry-header { margin-bottom: 0; }
+    .stat-bar { margin-bottom: 12px; }
+    .stat-num { font-size: 13pt; }
+    .stat-lbl { font-size: 6.5pt; }
+    .stat-cell { padding: 7px 10px; }
   }
   @media (max-width: 600px) {
     .page { padding: 28px 24px; }
     nav { padding: 12px 20px; }
+    .stat-bar { flex-wrap: wrap; }
+    .stat-cell { flex: 1 1 45%; border-bottom: 1px solid var(--rule); }
   }
 </style>
 </head>
@@ -206,38 +232,7 @@
   <!-- SUMMARY -->
   <section>
     <div class="section-title">Summary</div>
-    <p>Digital Communications &amp; Storytelling student at SUNY Canton with a Marketing minor. Produces social media content that has reached 8,000+ viewers, creates interactive websites using HTML, and has hands-on experience in public relations, video editing, and community outreach.</p>
-  </section>
-
-  <!-- SKILLS -->
-  <section>
-    <div class="section-title">Skills</div>
-    <div class="skills-group">
-      <div class="skills-label">Technical</div>
-      <div class="skills-grid">
-        <span class="skill-tag">HTML &amp; Web Design</span>
-        <span class="skill-tag">Adobe Premiere Pro</span>
-        <span class="skill-tag">Microsoft Excel</span>
-        <span class="skill-tag">SQL Server</span>
-        <span class="skill-tag">Python</span>
-        <span class="skill-tag">C#</span>
-        <span class="skill-tag">Social Media Analytics</span>
-        <span class="skill-tag">Mobile Media</span>
-       <span class="skill-tag">Data Entry &amp; Analysis</span>
-      </div>
-    </div>
-    <div class="skills-group" style="margin-top:10px;">
-      <div class="skills-label">Communication &amp; Leadership</div>
-      <div class="skills-grid">
-        <span class="skill-tag">Public Speaking &amp; Presentation</span>
-        <span class="skill-tag">Interviewing</span>
-        <span class="skill-tag">Community Outreach</span>
-        <span class="skill-tag">Team Coordination</span>
-        <span class="skill-tag">Digital Marketing</span>
-        <span class = "skill-tag"> Confliction Resolution </span>
-        
-      </div>
-    </div>
+    <p>Digital Communications &amp; Storytelling student at SUNY Canton (Dean's List) with a Marketing minor. Produces short-form video content for an institutional Instagram with 5,000+ followers — one reel reached 135,000 views. Builds interactive websites in HTML, with hands-on experience in public relations, video editing, on-camera interviewing, and community outreach.</p>
   </section>
 
   <!-- EXPERIENCE -->
@@ -249,13 +244,47 @@
         <span class="job-title">Public Relations Intern</span>
         <span class="date">01/2026 – Present</span>
       </div>
-      <div class="org">SUNY Canton, Canton, NY</div>
+      <div class="org">SUNY Canton — Canton, NY</div>
+
+      <div class="stat-bar">
+        <div class="stat-cell">
+          <div class="stat-num">135K</div>
+          <div class="stat-lbl">views on a single reel</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-num">3,000+</div>
+          <div class="stat-lbl">likes on top reel</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-num">5,042</div>
+          <div class="stat-lbl">account followers</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-num">50+</div>
+          <div class="stat-lbl">hours editing</div>
+        </div>
+      </div>
+
       <ul>
-        <li>Produce and edit short-form video content for SUNY Canton's Instagram — one reel reached 8,448 views at a school of under 3,000 students.</li>
-        <li>50+ hours of hands-on video editing in Adobe Premiere Pro, covering footage capture, pacing, color, and captions for social media.</li>
-        <li>Interview students and staff on campus for content series, including career fair and campus life features.</li>
+        <li>Produce and edit short-form video content for SUNY Canton's Instagram — one reel hit 135,000 views and 3,000+ likes at a school of under 3,000 students.</li>
+        <li>50+ hours of hands-on video editing in Adobe Premiere Pro covering footage capture, pacing, color, and captions.</li>
+        <li>Conduct on-campus interviews with students and staff for content series including career fair and campus life features.</li>
         <li>Represent the college through public speaking at campus events.</li>
-        <li>Study Instagram analytics and track social media strategies across comparable colleges to shape content decisions.</li>
+        <li>Track Instagram analytics and study social media strategies at comparable institutions to shape content decisions.</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-header">
+        <span class="job-title">Video Editor &amp; Content Specialist</span>
+        <span class="date">06/2026 – Present</span>
+      </div>
+      <div class="org">ProfSquared — Remote</div>
+      <ul>
+        <li>Edit and reformat academic video content for distribution across YouTube and short-form platforms.</li>
+        <li>Review raw footage and provide feedback on pacing, structure, and audience retention for educational content.</li>
+        <li>Assist in developing a content distribution workflow to organize and schedule video uploads across platforms.</li>
+        <li>Apply short-form video best practices to repurpose long-form material for wider reach.</li>
       </ul>
     </div>
 
@@ -264,11 +293,11 @@
         <span class="job-title">Orientation Leader</span>
         <span class="date">08/2025 – Present</span>
       </div>
-      <div class="org">SUNY Canton, Canton, NY</div>
+      <div class="org">SUNY Canton — Canton, NY</div>
       <ul>
         <li>Assisted incoming students with move-in and directed them to classrooms, offices, and campus resources.</li>
         <li>Answered questions about college programs, policies, and campus life in a public-facing role on behalf of the college.</li>
-        <li>Collaborated with a team of orientation leaders to coordinate student programming and ensure a smooth transition for new students.</li>
+        <li>Collaborated with a team of orientation leaders to coordinate student programming and ease new student transitions.</li>
       </ul>
     </div>
 
@@ -277,12 +306,14 @@
         <span class="job-title">Canvasser</span>
         <span class="date">06/2023 – Present</span>
       </div>
-      <div class="org">All of Us, Schenectady, NY</div>
+      <div class="org">All of Us — Schenectady, NY</div>
       <ul>
-        <li>Carry out door-to-door community outreach each summer to raise awareness about local programs and services.</li>
-        <li>Register voters through direct face-to-face conversations and deliver campaign messages to community members.</li>
-        <li>Coordinate material distribution to drive event attendance and handle data entry to keep members informed.</li>
-        <li>Track outreach data each cycle to improve targeting and resource allocation.</li>
+        <li>Conduct door-to-door community outreach each summer across Schenectady neighborhoods to raise awareness about local programs, services, and civic opportunities.</li>
+        <li>Register voters and deliver campaign messaging through direct face-to-face conversations with community members from diverse backgrounds.</li>
+        <li>Adapt communication style on the fly to connect with different audiences, from first-time voters to longtime residents.</li>
+        <li>Coordinate literature drops and material distribution to drive event attendance and increase program visibility.</li>
+        <li>Handle data entry after each shift to log contacts, track outreach progress, and keep member records current.</li>
+        <li>Use outreach data across cycles to refine targeting, improve efficiency, and allocate resources where engagement is highest.</li>
       </ul>
     </div>
 
@@ -291,7 +322,7 @@
         <span class="job-title">Software Intern</span>
         <span class="date">07/2022 – 08/2022</span>
       </div>
-      <div class="org">SCube, Schenectady, NY</div>
+      <div class="org">SCube — Schenectady, NY</div>
       <ul>
         <li>Analyzed municipal data sets to support business decisions.</li>
         <li>Validated and organized data using Microsoft Excel and SQL Server.</li>
@@ -300,7 +331,38 @@
     </div>
   </section>
 
-   <!-- PROJECTS -->
+  <!-- SKILLS -->
+  <section>
+    <div class="section-title">Skills</div>
+    <div class="skills-group">
+      <div class="skills-label">Technical</div>
+      <div class="skills-grid">
+        <span class="skill-tag">HTML &amp; Web Design</span>
+        <span class="skill-tag">Adobe Premiere Pro</span>
+        <span class="skill-tag">Instagram Reels</span>
+        <span class="skill-tag">Social Media Analytics</span>
+        <span class="skill-tag">Mobile Media</span>
+        <span class="skill-tag">Microsoft Excel</span>
+        <span class="skill-tag">SQL Server</span>
+        <span class="skill-tag">Python</span>
+        <span class="skill-tag">C#</span>
+        <span class="skill-tag">Data Entry &amp; Analysis</span>
+      </div>
+    </div>
+    <div class="skills-group" style="margin-top:10px;">
+      <div class="skills-label">Communication &amp; Leadership</div>
+      <div class="skills-grid">
+        <span class="skill-tag">On-Camera Interviewing</span>
+        <span class="skill-tag">Public Speaking &amp; Presentation</span>
+        <span class="skill-tag">Digital Marketing</span>
+        <span class="skill-tag">Community Outreach</span>
+        <span class="skill-tag">Team Coordination</span>
+        <span class="skill-tag">Conflict Resolution</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
   <section>
     <div class="section-title">Projects</div>
     <div class="project-entry">
@@ -350,16 +412,14 @@
   <!-- EDUCATION -->
   <section>
     <div class="section-title">Education</div>
-
     <div class="edu-entry">
       <div class="entry-header">
         <span class="edu-school">SUNY Canton</span>
         <span class="date">2023 – Present</span>
       </div>
       <div class="edu-degree">B.S. Digital Communications &amp; Storytelling &nbsp;|&nbsp; Marketing Minor</div>
-      <div class="edu-details">Relevant Coursework: Web Design, Marketing, Mobile Media</div>
+      <div class="edu-details">Dean's List &nbsp;·&nbsp; Relevant Coursework: Web Design, Marketing, Mobile Media</div>
     </div>
-
     <div class="edu-entry">
       <div class="entry-header">
         <span class="edu-school">Schenectady High School</span>
